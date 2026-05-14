@@ -1,0 +1,52 @@
+<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dark background consistent with Vault identity - lightened slightly for better visibility -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#152A15" />
+      <stop offset="100%" stop-color="#0A140A" />
+    </linearGradient>
+
+    <linearGradient id="facetHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D9FFC7" />
+      <stop offset="100%" stop-color="#B8F095" />
+    </linearGradient>
+    
+    <linearGradient id="facetMedium" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A2E680" />
+      <stop offset="100%" stop-color="#76B557" />
+    </linearGradient>
+    
+    <filter id="crystalShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-opacity="0.45" flood-color="#000" />
+    </filter>
+  </defs>
+
+  <!-- Outer Rounded Container -->
+  <rect width="100" height="100" rx="24" fill="url(#bgGradient)" />
+
+  <!-- Logo Content centered and padded -->
+  <g transform="translate(10, 10) scale(0.8)" filter="url(#crystalShadow)">
+    <!-- RIGHT WING -->
+    <g>
+      <path d="M50 95L85 45L80 25L50 65V95Z" fill="#2E5224" />
+      <path d="M85 45L80 25L50 65V67L83 44L85 45Z" fill="white" opacity="0.15" />
+      <path d="M50 95L75 60L80 25L60 45L50 95Z" fill="url(#facetMedium)" />
+      <path d="M50 95L50 65L60 45L50 95Z" fill="#5D8C47" />
+      <path d="M80 25L60 45L75 60L80 25Z" fill="url(#facetHighlight)" />
+      <path d="M80 25L60 45L62 44L80 25Z" fill="white" opacity="0.25" />
+    </g>
+
+    <!-- LEFT WING -->
+    <g>
+      <path d="M50 95L15 45L20 25L50 65V95Z" fill="#2E5224" />
+      <path d="M15 45L20 25L50 65V67L17 44L15 45Z" fill="white" opacity="0.15" />
+      <path d="M50 95L25 60L20 25L40 45L50 95Z" fill="url(#facetMedium)" />
+      <path d="M50 95L50 65L40 45L50 95Z" fill="#5D8C47" />
+      <path d="M20 25L40 45L25 60L20 25Z" fill="url(#facetHighlight)" />
+      <path d="M20 25L40 45L38 44L20 25Z" fill="white" opacity="0.25" />
+    </g>
+
+    <!-- Pivot -->
+    <path d="M48 92L50 95L52 92L50 90L48 92Z" fill="#D9FFC7" />
+  </g>
+</svg>

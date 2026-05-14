@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "Carteira": {
+      "title": "Carteira",
+      "description": "Uma pasta ou carteira de ativos do usuário",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nome": { "type": "string" },
+        "tipo": { "type": "string" },
+        "descricao": { "type": "string" },
+        "cnpj": { "type": "string" },
+        "razaoSocial": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "nome", "tipo", "userId"]
+    },
+    "Lancamento": {
+      "title": "Lancamento",
+      "description": "Uma transação financeira associada a uma carteira",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "data": { "type": "string", "format": "date" },
+        "desc": { "type": "string" },
+        "valor": { "type": "number" },
+        "cat": { "type": "string" },
+        "tipo": { "type": "string", "enum": ["receita", "despesa", "investimento"] },
+        "carteiraId": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "data", "desc", "valor", "cat", "tipo", "carteiraId", "userId"]
+    },
+    "Meta": {
+      "title": "Meta",
+      "description": "Um objetivo financeiro associado a uma carteira",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "titulo": { "type": "string" },
+        "valor": { "type": "number" },
+        "atual": { "type": "number" },
+        "prazo": { "type": "string", "format": "date" },
+        "cor": { "type": "string" },
+        "carteiraId": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "titulo", "valor", "atual", "prazo", "cor", "carteiraId", "userId"]
+    },
+    "Investimento": {
+      "title": "Investimento",
+      "description": "Um ativo na carteira associado a uma carteira específica",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ativo": { "type": "string" },
+        "tipo": { "type": "string" },
+        "valor": { "type": "number" },
+        "qtd": { "type": "number" },
+        "preco": { "type": "number" },
+        "carteiraId": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "ativo", "tipo", "valor", "qtd", "preco", "carteiraId", "userId"]
+    },
+    "ShoppingItem": {
+      "title": "ShoppingItem",
+      "description": "Um item na lista de compras",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nome": { "type": "string" },
+        "prioridade": { "type": "string", "enum": ["baixa", "media", "alta"] },
+        "comprado": { "type": "boolean" },
+        "precoEstimado": { "type": "number" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "nome", "prioridade", "comprado", "userId"]
+    },
+    "GastoFixo": {
+      "title": "GastoFixo",
+      "description": "Um gasto fixo mensal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nome": { "type": "string" },
+        "valor": { "type": "number" },
+        "diaVencimento": { "type": "number" },
+        "categoria": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "nome", "valor", "diaVencimento", "categoria", "userId"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil detalhado do usuário",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "dataNascimento": { "type": "string" },
+        "genero": { "type": "string" },
+        "cidade": { "type": "string" },
+        "uf": { "type": "string" },
+        "pais": { "type": "string" },
+        "rendimentoMensal": { "type": "number" }
+      },
+      "required": ["userId"]
+    }
+  },
+  "firestore": {
+    "carteiras/{carteiraId}": {
+      "schema": "Carteira",
+      "description": "Coleção de carteiras do usuário"
+    },
+    "lancamentos/{lancamentoId}": {
+      "schema": "Lancamento",
+      "description": "Coleção de lançamentos financeiros"
+    },
+    "metas/{metaId}": {
+      "schema": "Meta",
+      "description": "Coleção de metas financeiras"
+    },
+    "investimentos/{investimentoId}": {
+      "schema": "Investimento",
+      "description": "Coleção de ativos"
+    },
+    "shoppingItems/{itemId}": {
+      "schema": "ShoppingItem",
+      "description": "Itens da lista de compras"
+    },
+    "gastosFixos/{gastoId}": {
+      "schema": "GastoFixo",
+      "description": "Despesas fixas recorrentes"
+    },
+    "userProfiles/{userId}": {
+      "schema": "UserProfile",
+      "description": "Perfis de usuário detalhados"
+    }
+  }
+}

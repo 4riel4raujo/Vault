@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidCarteira(data) {
+      return data.keys().hasAll(['id', 'nome', 'tipo', 'descricao', 'userId']) &&
+             data.keys().size() >= 5 && data.keys().size() <= 12 &&
+             data.id is string && data.nome is string && data.nome.size() <= 100 &&
+             data.userId == request.auth.uid &&
+             (!data.keys().hasAny(['cnpj']) || data.cnpj is string) &&
+             (!data.keys().hasAny(['razaoSocial']) || data.razaoSocial is string);
+    }
+
+    function isValidLancamento(data) {
+      return data.keys().hasAll(['id', 'data', 'desc', 'valor', 'cat', 'tipo', 'carteiraId', 'userId']) &&
+             data.keys().size() >= 8 && data.keys().size() <= 12 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidMeta(data) {
+      return data.keys().hasAll(['id', 'titulo', 'valor', 'atual', 'prazo', 'cor', 'carteiraId', 'userId']) &&
+             data.keys().size() >= 8 && data.keys().size() <= 12 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidInvestimento(data) {
+      return data.keys().hasAll(['id', 'ativo', 'tipo', 'valor', 'qtd', 'preco', 'carteiraId', 'userId']) &&
+             data.keys().size() >= 8 && data.keys().size() <= 12 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidShoppingItem(data) {
+      return data.keys().hasAll(['id', 'nome', 'prioridade', 'comprado', 'userId']) &&
+             data.keys().size() >= 5 && data.keys().size() <= 10 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidGastoFixo(data) {
+      return data.keys().hasAll(['id', 'nome', 'valor', 'diaVencimento', 'categoria', 'userId']) &&
+             data.keys().size() >= 6 && data.keys().size() <= 10 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId']) &&
+             data.keys().size() >= 1 && data.keys().size() <= 10 &&
+             data.userId == request.auth.uid &&
+             (!data.keys().hasAny(['dataNascimento']) || (data.dataNascimento is string && data.dataNascimento.size() <= 20)) &&
+             (!data.keys().hasAny(['genero']) || (data.genero is string && data.genero.size() <= 50)) &&
+             (!data.keys().hasAny(['cidade']) || (data.cidade is string && data.cidade.size() <= 100)) &&
+             (!data.keys().hasAny(['uf']) || (data.uf is string && data.uf.size() <= 5)) &&
+             (!data.keys().hasAny(['pais']) || (data.pais is string && data.pais.size() <= 100)) &&
+             (!data.keys().hasAny(['rendimentoMensal']) || (data.rendimentoMensal is number && data.rendimentoMensal >= 0));
+    }
+
+    match /carteiras/{carteiraId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidCarteira(request.resource.data) && isValidId(carteiraId);
+      allow update: if isSignedIn() && isValidCarteira(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /lancamentos/{lancamentoId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidLancamento(request.resource.data) && isValidId(lancamentoId);
+      allow update: if isSignedIn() && isValidLancamento(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /metas/{metaId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidMeta(request.resource.data) && isValidId(metaId);
+      allow update: if isSignedIn() && isValidMeta(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /investimentos/{investimentoId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidInvestimento(request.resource.data) && isValidId(investimentoId);
+      allow update: if isSignedIn() && isValidInvestimento(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /shoppingItems/{itemId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidShoppingItem(request.resource.data) && isValidId(itemId);
+      allow update: if isSignedIn() && isValidShoppingItem(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /gastosFixos/{gastoId} {
+      allow read, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidGastoFixo(request.resource.data) && isValidId(gastoId);
+      allow update: if isSignedIn() && isValidGastoFixo(request.resource.data) && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /userProfiles/{userId} {
+      allow read: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && isValidUserProfile(request.resource.data) && userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidUserProfile(request.resource.data) && resource.data.userId == request.auth.uid && request.resource.data.userId == resource.data.userId;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+    
+    match /test/connection {
+      allow get: if isSignedIn();
+    }
+  }
+}
