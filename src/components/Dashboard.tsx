@@ -14,7 +14,7 @@ import {
   Filler
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
-import { Calendar, TrendingUp, PieChart, Activity } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, PieChart, Activity, DollarSign, ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { DBState, COLORS, Carteira, CAT_MAP } from '../types';
 
@@ -42,14 +42,14 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.04
     }
   }
 };
 
 const itemVar = {
-  hidden: { y: 20, opacity: 0 },
-  show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  hidden: { y: 14, opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
 import { usePreferences } from '../contexts/PreferencesContext';
@@ -172,11 +172,15 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
         </div>
         <div className="saldo-chips">
           <div>
-            <div className="saldo-chip-lbl">↑ {t('revenue_month')}</div>
+            <div className="saldo-chip-lbl" style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <ArrowUp size={11} strokeWidth={2.5} style={{ color: 'rgba(255, 255, 255, 0.7)' }} /> {t('revenue_month')}
+            </div>
             <div className="saldo-chip-val">{formatCurrency(tm.rec)}</div>
           </div>
           <div>
-            <div className="saldo-chip-lbl">↓ {t('expenses_month')}</div>
+            <div className="saldo-chip-lbl" style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+              <ArrowDown size={11} strokeWidth={2.5} style={{ color: 'rgba(255, 255, 255, 0.7)' }} /> {t('expenses_month')}
+            </div>
             <div className="saldo-chip-val">{formatCurrency(tm.desp)}</div>
           </div>
         </div>
@@ -185,21 +189,21 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
       <div className="cards-row" style={activeWall?.tipo === 'Empresarial' ? { gridTemplateColumns: 'repeat(3, 1fr)' } : {}}>
         <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
           <div className="metric-icon" style={{ background: 'var(--green-g)' }}>
-             <TrendingUpIcon color="var(--green)" />
+             <TrendingUp size={16} strokeWidth={2.5} color="var(--green)" />
           </div>
           <div className="metric-label">{t('revenue_month')}</div>
           <div className="metric-val pos">{formatCurrency(tm.rec)}</div>
         </motion.div>
         <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
           <div className="metric-icon" style={{ background: 'var(--red-g)' }}>
-             <TrendingDownIcon color="var(--red)" />
+             <TrendingDown size={16} strokeWidth={2.5} color="var(--red)" />
           </div>
           <div className="metric-label">{t('expenses_month')}</div>
           <div className="metric-val neg">{formatCurrency(tm.desp)}</div>
         </motion.div>
         <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
           <div className="metric-icon" style={{ background: tm.saldo >= 0 ? 'var(--green-g)' : 'var(--red-g)' }}>
-             <span className="t-body-lg t-bold" style={{ color: tm.saldo >= 0 ? 'var(--green)' : 'var(--red)' }}>$</span>
+              <DollarSign size={16} strokeWidth={2.5} color={tm.saldo >= 0 ? 'var(--green)' : 'var(--red)'} />
           </div>
           <div className="metric-label">{t('balance_month')}</div>
           <div className={`metric-val ${tm.saldo >= 0 ? 'pos' : 'neg'}`}>{formatCurrency(tm.saldo)}</div>
@@ -207,7 +211,7 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
         {activeWall?.tipo !== 'Empresarial' && (
           <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
             <div className="metric-icon" style={{ background: 'rgba(175,82,222,0.13)' }}>
-              <TrendingUpIcon color="#af52de" />
+              <TrendingUp size={16} strokeWidth={2.5} color="#af52de" />
             </div>
             <div className="metric-label">{t('investments')}</div>
             <div className="metric-val" style={{ color: 'var(--purple)' }}>{formatCurrency(totalInv)}</div>
@@ -277,33 +281,33 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                    style={{
-                      position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 50,
-                      background: 'var(--glass-strong)', 
-                      backdropFilter: 'blur(30px)',
-                      WebkitBackdropFilter: 'blur(30px)',
-                      border: '1px solid var(--glass-border)', borderRadius: '14px', padding: '14px',
-                      boxShadow: 'var(--shadow-glass)', minWidth: '220px'
-                    }}
+                    className="custom-picker-dropdown"
+                    style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0 }}
                   >
-                    <div className="t-xs t-bold t-muted t-uppercase" style={{ marginBottom: '8px' }}>{t('custom')}</div>
-                    <input 
-                      type="date" 
-                      value={catCustomDates?.from || ''} 
-                      onChange={e => setCatCustomDates(prev => ({ from: e.target.value, to: prev?.to || dbService.getToday() }))}
-                      className="t-sm"
-                      style={{ marginBottom: '8px', padding: '8px' }}
-                    />
-                    <input 
-                      type="date" 
-                      value={catCustomDates?.to || ''} 
-                      onChange={e => setCatCustomDates(prev => ({ from: prev?.from || dbService.getToday(), to: e.target.value }))}
-                      className="t-sm"
-                      style={{ padding: '8px' }}
-                    />
-                    <div style={{ textAlign: 'right', marginTop: '10px' }}>
-                      <button onClick={() => setIsCatPickerOpen(false)} className="t-sm t-semibold" style={{ color: 'var(--accent)', border: 'none', background: 'none', cursor: 'pointer' }}>{t('ready')}</button>
+                    <div className="custom-picker-header">{t('custom')}</div>
+                    
+                    <div className="custom-date-container">
+                      <input 
+                        type="date" 
+                        value={catCustomDates?.from || ''} 
+                        onChange={e => setCatCustomDates(prev => ({ from: e.target.value, to: prev?.to || dbService.getToday() }))}
+                      />
                     </div>
+                    
+                    <div className="custom-date-container">
+                      <input 
+                        type="date" 
+                        value={catCustomDates?.to || ''} 
+                        onChange={e => setCatCustomDates(prev => ({ from: prev?.from || dbService.getToday(), to: e.target.value }))}
+                      />
+                    </div>
+                    
+                    <button 
+                      onClick={() => setIsCatPickerOpen(false)} 
+                      className="custom-picker-confirm-btn"
+                    >
+                      {t('ready')}
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -317,6 +321,9 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
                   responsive: true,
                   maintainAspectRatio: false,
                   cutout: '65%',
+                  layout: {
+                    padding: 8
+                  },
                   plugins: {
                     legend: { 
                       position: window.innerWidth < 768 ? 'bottom' as const : 'right' as const,
@@ -383,14 +390,15 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '5px',
                 letterSpacing: '0.5px',
                 opacity: 0.8
               }}
-              whileHover={{ scale: 1.05, opacity: 1, x: 2 }}
+              whileHover={{ scale: 1.05, opacity: 1 }}
               whileTap={{ scale: 0.95 }}
             >
               {t('see_all')}
+              <ArrowRight size={14} strokeWidth={2.5} />
             </motion.button>
           </div>
         )}
@@ -399,13 +407,5 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
 
     </motion.div>
   );
-}
-
-function TrendingUpIcon({ color }: { color: string }) {
-  return <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ width: '17px', height: '17px' }}><path d="M12 19V5M5 12l7-7 7 7"/></svg>;
-}
-
-function TrendingDownIcon({ color }: { color: string }) {
-  return <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ width: '17px', height: '17px' }}><path d="M12 5v14M5 12l7 7 7-7"/></svg>;
 }
 

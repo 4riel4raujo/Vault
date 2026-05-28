@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Plus, Filter, Trash2, Edit2, FileUp, LayoutList, ArrowUpCircle, ArrowDownCircle, TrendingUp, Check } from 'lucide-react';
+import { Search, Plus, Filter, Trash2, Edit2, FileUp, LayoutList, ArrowUpCircle, ArrowDownCircle, TrendingUp, Check, Inbox } from 'lucide-react';
 import { dbService } from '../services/dbService';
-import { DBState, OperationType, Lancamento, CATS } from '../types';
+import { DBState, OperationType, Lancamento, CATS, CAT_MAP } from '../types';
 
 interface Props {
   db: DBState;
@@ -24,8 +24,8 @@ const container = {
 };
 
 const itemVar = {
-  hidden: { opacity: 0, x: -10 },
-  show: { opacity: 1, x: 0 }
+  hidden: { opacity: 0, x: -8 },
+  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
 import { usePreferences } from '../contexts/PreferencesContext';
@@ -247,7 +247,7 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
                   <div style={{ fontWeight: 500 }}>{l.desc}</div>
                   {l.obs && <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{l.obs}</div>}
                 </td>
-                <td><span className="tag tag-orange">{l.cat}</span></td>
+                <td><span className="tag tag-orange">{CAT_MAP[l.cat] ? t(CAT_MAP[l.cat]) : l.cat}</span></td>
                 <td>
                   <span className={`tag ${l.tipo === 'receita' ? 'tag-green' : l.tipo === 'despesa' ? 'tag-red' : 'tag-purple'}`}>
                     {l.tipo === 'investimento' ? t('investment_aporte') || 'Aporte' : t(l.tipo) || l.tipo}
@@ -285,7 +285,7 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
                     <div className="mtc-meta">
                       <span>{dbService.formatDate(l.data)}</span>
                       <span className="dot" style={{ width: 3, height: 3, margin: '0 4px', background: 'var(--muted)' }} />
-                      <span>{l.cat}</span>
+                      <span>{CAT_MAP[l.cat] ? t(CAT_MAP[l.cat]) : l.cat}</span>
                     </div>
                   </div>
                   <div className={`mtc-value ${l.tipo === 'receita' ? 'pos' : l.tipo === 'despesa' ? 'neg' : 'accent-txt'}`}>
@@ -307,7 +307,7 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
         </div>
         {filtered.length === 0 && (
           <div className="empty">
-            <div className="empty-icon">📋</div>
+            <div className="empty-icon"><Inbox size={32} strokeWidth={1.5} style={{ color: 'var(--muted)', opacity: 0.7 }} /></div>
             {t('none_found')}
           </div>
         )}

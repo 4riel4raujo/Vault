@@ -61,6 +61,7 @@ export interface ShoppingItem {
   comprado: boolean;
   precoEstimado?: number;
   userId: string;
+  carteiraId?: string;
 }
 
 export interface GastoFixo {
@@ -70,6 +71,7 @@ export interface GastoFixo {
   diaVencimento: number;
   categoria: string;
   userId: string;
+  carteiraId?: string;
 }
 
 export interface UserProfileData {
@@ -113,6 +115,16 @@ export const CAT_MAP: Record<string, string> = {
   'Vestuário': 'clothing', 'Serviços': 'services', 'Assinaturas': 'subscriptions',
   'Extras': 'extras', 'Renda Fixa': 'fixed_income', 'Ações': 'stocks', 'FIIs': 'fiis',
   'Tesouro': 'treasury', 'Cripto': 'crypto', 'ETFs': 'etfs', 'Poupança': 'savings'
+};
+
+export const INV_TYPE_MAP: Record<string, string> = {
+  'Renda Fixa': 'fixed_income',
+  'Ações': 'stocks',
+  'FIIs': 'fiis',
+  'Tesouro': 'treasury',
+  'Cripto': 'crypto',
+  'ETFs': 'etfs',
+  'Poupança': 'savings'
 };
 
 export const COLOR_MAP: Record<string, string> = {

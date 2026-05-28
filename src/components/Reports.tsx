@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Line } from 'react-chartjs-2';
 import { FileDown, TrendingUp, PieChart } from 'lucide-react';
 import { dbService } from '../services/dbService';
-import { DBState, COLORS } from '../types';
+import { DBState, COLORS, CAT_MAP } from '../types';
 import { usePreferences } from '../contexts/PreferencesContext';
 
 interface Props {
@@ -15,13 +15,13 @@ const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
+    transition: { staggerChildren: 0.05 }
   }
 };
 
 const itemVar = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
 export default function Reports({ db, onExportCSV }: Props) {
@@ -143,7 +143,7 @@ export default function Reports({ db, onExportCSV }: Props) {
             return (
               <div key={c} style={{ marginBottom: '14px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 500 }}>{c}</span>
+                  <span style={{ fontWeight: 500 }}>{CAT_MAP[c] ? t(CAT_MAP[c]) : c}</span>
                   <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{formatCurrency(v)} ({pct}%)</span>
                 </div>
                 <div className="prog-bar">

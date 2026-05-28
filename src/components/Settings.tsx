@@ -15,13 +15,13 @@ const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
+    transition: { staggerChildren: 0.05 }
   }
 };
 
 const itemVar = {
-  hidden: { opacity: 0, x: -20 },
-  show: { opacity: 1, x: 0 }
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
 import { usePreferences } from '../contexts/PreferencesContext';
@@ -299,7 +299,7 @@ export default function Settings() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ textAlign: 'center', padding: '20px', background: 'var(--accent-low)', borderRadius: '20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>☁️</div>
-            <h3 className="t-h3">{t('cloud_save_sub')}</h3>
+            <h3 className="t-h3" style={{ marginBottom: '8px' }}>{t('cloud_save_sub')}</h3>
             <p className="t-body t-muted" style={{ margin: 0, lineHeight: 1.5 }}>
               {t('cloud_save_desc')}
             </p>
@@ -307,23 +307,23 @@ export default function Settings() {
 
           <div style={{ display: 'grid', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--glass-strong)', borderRadius: '12px' }}>
-              <Shield size={20} style={{ color: 'var(--accent)' }} />
+              <Shield size={20} style={{ color: 'var(--accent)', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
-                <div className="t-body t-bold">{t('encryption')}</div>
+                <div className="t-body t-bold" style={{ color: 'var(--text)' }}>{t('encryption')}</div>
                 <div className="t-xs t-muted">{t('encryption_desc')}</div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--glass-strong)', borderRadius: '12px' }}>
-              <Save size={20} style={{ color: 'var(--accent)' }} />
+              <Save size={20} style={{ color: 'var(--accent)', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
-                <div className="t-body t-bold">{t('auto_backup')}</div>
+                <div className="t-body t-bold" style={{ color: 'var(--text)' }}>{t('auto_backup')}</div>
                 <div className="t-xs t-muted">{t('auto_backup_desc')}</div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--glass-strong)', borderRadius: '12px' }}>
-              <Monitor size={20} style={{ color: 'var(--accent)' }} />
+              <Monitor size={20} style={{ color: 'var(--accent)', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
-                <div className="t-body t-bold">{t('multi_device')}</div>
+                <div className="t-body t-bold" style={{ color: 'var(--text)' }}>{t('multi_device')}</div>
                 <div className="t-xs t-muted">{t('multi_device_desc')}</div>
               </div>
             </div>
@@ -362,7 +362,7 @@ export default function Settings() {
               onChange={handleFileChange} 
             />
 
-            <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600 }}>{t('click_to_change_photo')}</div>
+            <div className="t-xs t-semibold t-muted">{t('click_to_change_photo')}</div>
           </div>
 
           <div className="fg">
@@ -404,19 +404,19 @@ export default function Settings() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <div className="t-xs t-muted">{t('birth_date')}</div>
-                  <div className="t-sm t-medium">{userProfile?.dataNascimento}</div>
+                  <div className="t-sm t-bold" style={{ color: 'var(--text)' }}>{userProfile?.dataNascimento}</div>
                 </div>
                 <div>
                   <div className="t-xs t-muted">{t('gender')}</div>
-                  <div className="t-sm t-medium" style={{ textTransform: 'capitalize' }}>{userProfile?.genero || '-'}</div>
+                  <div className="t-sm t-bold" style={{ color: 'var(--text)', textTransform: 'capitalize' }}>{userProfile?.genero || '-'}</div>
                 </div>
                 <div>
                   <div className="t-xs t-muted">{t('city')}</div>
-                  <div className="t-sm t-medium">{userProfile?.cidade}, {userProfile?.uf}</div>
+                  <div className="t-sm t-bold" style={{ color: 'var(--text)' }}>{userProfile?.cidade}, {userProfile?.uf}</div>
                 </div>
                 <div>
                   <div className="t-xs t-muted">{t('country')}</div>
-                  <div className="t-sm t-medium">{userProfile?.pais}</div>
+                  <div className="t-sm t-bold" style={{ color: 'var(--text)' }}>{userProfile?.pais}</div>
                 </div>
               </div>
             </div>
@@ -439,7 +439,7 @@ export default function Settings() {
               }}
             >
               <UserPlus size={18} />
-              {t('verify_account')}
+              <span className="t-sm t-bold">{t('verify_account')}</span>
             </button>
           )}
         </div>
@@ -455,7 +455,7 @@ export default function Settings() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div className="fg">
-              <label className="t-medium">{t('birth_date')}</label>
+              <label>{t('birth_date')}</label>
               <div style={{ position: 'relative' }}>
                 <CalendarIcon size={14} style={{ position: 'absolute', left: '12px', top: '50.5%', transform: 'translateY(-50%)', color: 'var(--accent)', zIndex: 1 }} />
                 <input 
@@ -467,7 +467,7 @@ export default function Settings() {
               </div>
             </div>
             <div className="fg">
-              <label className="t-medium">{t('gender')}</label>
+              <label>{t('gender')}</label>
               <CustomSelect
                 value={genero}
                 onChange={setGenero}
@@ -486,7 +486,7 @@ export default function Settings() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
             <div className="fg">
-              <label className="t-medium">{t('city')}</label>
+              <label>{t('city')}</label>
               <div style={{ position: 'relative' }}>
                 <MapPin size={14} style={{ position: 'absolute', left: '12px', top: '50.5%', transform: 'translateY(-50%)', color: 'var(--accent)', zIndex: 1 }} />
                 <input 
@@ -499,7 +499,7 @@ export default function Settings() {
               </div>
             </div>
             <div className="fg">
-              <label className="t-medium">UF</label>
+              <label>UF</label>
               <input 
                 type="text" 
                 value={uf} 
@@ -511,7 +511,7 @@ export default function Settings() {
           </div>
 
           <div className="fg">
-            <label className="t-medium">{t('country')}</label>
+            <label>{t('country')}</label>
             <div style={{ position: 'relative' }}>
               <Globe size={14} style={{ position: 'absolute', left: '12px', top: '50.5%', transform: 'translateY(-50%)', color: 'var(--accent)', zIndex: 1 }} />
               <input 
@@ -525,7 +525,7 @@ export default function Settings() {
           </div>
 
           <div className="fg">
-            <label className="t-medium">{t('monthly_income')}</label>
+            <label>{t('monthly_income')}</label>
             <div style={{ position: 'relative' }}>
               <DollarSign size={14} style={{ position: 'absolute', left: '12px', top: '50.5%', transform: 'translateY(-50%)', color: 'var(--accent)', zIndex: 1 }} />
               <input 
@@ -556,41 +556,41 @@ export default function Settings() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ background: 'var(--glass-strong)', padding: '16px', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Info size={14} /> {t('login_info')}
+            <div className="t-xs t-bold t-muted" style={{ marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Info size={14} style={{ color: 'var(--accent)' }} /> {t('login_info')}
             </div>
             
             <div style={{ display: 'grid', gap: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', color: 'var(--muted)' }}>E-mail</span>
-                <span style={{ fontSize: '14px', fontWeight: 600 }}>{user?.email}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                <span className="t-sm t-muted">E-mail</span>
+                <span className="t-sm t-bold" style={{ wordBreak: 'break-all', textAlign: 'right', color: 'var(--text)' }}>{user?.email}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', color: 'var(--muted)' }}>{t('verified')}</span>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: user?.emailVerified ? 'var(--green)' : 'var(--red)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                <span className="t-sm t-muted">{t('verified')}</span>
+                <span className="t-xs t-bold" style={{ color: user?.emailVerified ? 'var(--green)' : 'var(--red)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   {user?.emailVerified ? <ShieldCheck size={14} /> : <X size={14} />} 
                   {user?.emailVerified ? t('yes') : t('no')}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', color: 'var(--muted)' }}>{t('creation_date')}</span>
-                <span style={{ fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                <span className="t-sm t-muted">{t('creation_date')}</span>
+                <span className="t-sm t-bold" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text)' }}>
                   <Clock size={14} style={{ opacity: 0.5 }} /> {creationDate}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', color: 'var(--muted)' }}>{t('last_access')}</span>
-                <span style={{ fontSize: '14px', fontWeight: 600 }}>{lastSignIn}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                <span className="t-sm t-muted">{t('last_access')}</span>
+                <span className="t-sm t-bold" style={{ textAlign: 'right', color: 'var(--text)' }}>{lastSignIn}</span>
               </div>
             </div>
           </div>
 
           <div style={{ background: 'var(--glass-strong)', padding: '16px', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Key size={14} /> {t('password_access')}
+            <div className="t-xs t-bold t-muted" style={{ marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Key size={14} style={{ color: 'var(--accent)' }} /> {t('password_access')}
             </div>
             
-            <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+            <p className="t-sm t-muted" style={{ margin: '0 0 16px 0', lineHeight: 1.5 }}>
               {t('password_reset_info')}
             </p>
 
@@ -598,15 +598,14 @@ export default function Settings() {
               onClick={handlePasswordReset}
               className="btn btn-primary"
               disabled={isResetting}
-              style={{ width: '100%', justifyContent: 'center' }}
+              style={{ width: '100%', justifyContent: 'center', gap: '8px' }}
             >
               {isResetting ? t('sending') : <><Mail size={18} /> {t('send_reset_email')}</>}
             </button>
 
             {resetMessage && (
-              <div style={{ 
+              <div className="t-xs t-semibold" style={{ 
                 marginTop: '12px', padding: '10px 12px', borderRadius: '8px', 
-                fontSize: '12px', fontWeight: 600, 
                 background: resetMessage.includes('Erro') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 132, 61, 0.1)',
                 color: resetMessage.includes('Erro') ? 'var(--red)' : 'var(--green)',
                 textAlign: 'center'
@@ -617,8 +616,8 @@ export default function Settings() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'start', gap: '10px', padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '12px' }}>
-            <Shield size={16} style={{ color: 'var(--accent)', marginTop: '2px' }} />
-            <p style={{ fontSize: '11px', color: 'var(--muted)', margin: 0, lineHeight: 1.4 }}>
+            <Shield size={16} style={{ color: 'var(--accent)', marginTop: '2px', flexShrink: 0 }} />
+            <p className="t-xs t-muted" style={{ margin: 0, lineHeight: 1.4 }}>
               {t('security_footer_info')}
             </p>
           </div>
@@ -640,8 +639,8 @@ export default function Settings() {
             border: '1px solid var(--glass-border)'
           }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '14px' }}>{t('push_notifications')}</div>
-              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{t('push_notif_sub')}</div>
+              <div className="t-body t-bold" style={{ color: 'var(--text)', marginBottom: '4px' }}>{t('push_notifications')}</div>
+              <div className="t-xs t-muted" style={{ lineHeight: 1.3 }}>{t('push_notif_sub')}</div>
             </div>
             <div 
               onClick={() => setNotificationsEnabled(!notificationsEnabled)}
@@ -649,7 +648,7 @@ export default function Settings() {
                 width: '44px', height: '24px', borderRadius: '12px', 
                 background: notificationsEnabled ? 'var(--accent)' : 'var(--glass-border)',
                 padding: '2px', cursor: 'pointer', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', 
+                display: 'flex', alignItems: 'center', flexShrink: 0,
                 justifyContent: notificationsEnabled ? 'flex-end' : 'flex-start'
               }}
             >
@@ -666,8 +665,8 @@ export default function Settings() {
             border: '1px solid var(--glass-border)'
           }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '14px' }}>{t('email_notifications')}</div>
-              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{t('email_notif_sub')}</div>
+              <div className="t-body t-bold" style={{ color: 'var(--text)', marginBottom: '4px' }}>{t('email_notifications')}</div>
+              <div className="t-xs t-muted" style={{ lineHeight: 1.3 }}>{t('email_notif_sub')}</div>
             </div>
             <div 
               onClick={() => setEmailNotifications(!emailNotifications)}
@@ -675,7 +674,7 @@ export default function Settings() {
                 width: '44px', height: '24px', borderRadius: '12px', 
                 background: emailNotifications ? 'var(--accent)' : 'var(--glass-border)',
                 padding: '2px', cursor: 'pointer', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', 
+                display: 'flex', alignItems: 'center', flexShrink: 0,
                 justifyContent: emailNotifications ? 'flex-end' : 'flex-start'
               }}
             >
@@ -686,9 +685,9 @@ export default function Settings() {
             </div>
           </div>
 
-          <div style={{ marginTop: '12px', padding: '12px', background: 'var(--accent-low)', borderRadius: '12px', color: 'var(--accent)', fontSize: '11px', fontWeight: 600, display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Info size={14} />
-            {t('notif_tip')}
+          <div className="t-xs t-semibold" style={{ marginTop: '12px', padding: '12px', background: 'var(--accent-low)', borderRadius: '12px', color: 'var(--accent)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Info size={14} style={{ flexShrink: 0 }} />
+            <span>{t('notif_tip')}</span>
           </div>
         </div>
       </GenericModal>
@@ -704,8 +703,8 @@ export default function Settings() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Language Selection */}
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Languages size={14} /> {t('app_language')}
+            <div className="t-xs t-bold t-muted" style={{ marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Languages size={14} style={{ color: 'var(--accent)' }} /> {t('app_language')}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {[
@@ -716,9 +715,10 @@ export default function Settings() {
                 <button
                   key={lang.id}
                   onClick={() => setLanguage(lang.id as any)}
+                  className="t-sm t-semibold"
                   style={{ 
                     padding: '8px', borderRadius: '10px', border: '1px solid',
-                    fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                    cursor: 'pointer',
                     background: language === lang.id ? 'var(--accent)' : 'var(--glass-strong)',
                     color: language === lang.id ? 'white' : 'inherit',
                     borderColor: language === lang.id ? 'var(--accent)' : 'var(--glass-border)',
@@ -733,8 +733,8 @@ export default function Settings() {
 
           {/* Currency Selection */}
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Coins size={14} /> {t('default_currency')}
+            <div className="t-xs t-bold t-muted" style={{ marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Coins size={14} style={{ color: 'var(--accent)' }} /> {t('default_currency')}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {[
@@ -745,9 +745,10 @@ export default function Settings() {
                 <button
                   key={curr.id}
                   onClick={() => setCurrency(curr.id as any)}
+                  className="t-sm t-semibold"
                   style={{ 
                     padding: '8px', borderRadius: '10px', border: '1px solid',
-                    fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                    cursor: 'pointer',
                     background: currency === curr.id ? 'var(--accent)' : 'var(--glass-strong)',
                     color: currency === curr.id ? 'white' : 'inherit',
                     borderColor: currency === curr.id ? 'var(--accent)' : 'var(--glass-border)',
@@ -762,8 +763,8 @@ export default function Settings() {
 
           {/* Theme Selection */}
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Moon size={14} /> {t('display_mode')}
+            <div className="t-xs t-bold t-muted" style={{ marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Moon size={14} style={{ color: 'var(--accent)' }} /> {t('display_mode')}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {[
@@ -774,9 +775,10 @@ export default function Settings() {
                 <button
                   key={mode.id}
                   onClick={() => setThemeMode(mode.id as any)}
+                  className="t-sm t-semibold"
                   style={{ 
                     padding: '10px 8px', borderRadius: '10px', border: '1px solid',
-                    fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                    cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
                     background: themeMode === mode.id ? 'var(--accent)' : 'var(--glass-strong)',
                     color: themeMode === mode.id ? 'white' : 'inherit',
@@ -791,7 +793,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div style={{ marginTop: '8px', padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', fontSize: '11px', color: 'var(--muted)', textAlign: 'center' }}>
+          <div className="t-xs t-muted" style={{ marginTop: '8px', padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', textAlign: 'center' }}>
             {t('pref_footer')}
           </div>
         </div>

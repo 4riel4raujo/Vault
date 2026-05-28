@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Doughnut } from 'react-chartjs-2';
 import { Edit2, Trash2, PieChart, Activity, TrendingUp } from 'lucide-react';
 import { dbService } from '../services/dbService';
-import { DBState, Investimento, COLORS } from '../types';
+import { DBState, Investimento, COLORS, INV_TYPE_MAP } from '../types';
 import { usePreferences } from '../contexts/PreferencesContext';
 
 interface Props {
@@ -16,13 +16,13 @@ const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
+    transition: { staggerChildren: 0.05 }
   }
 };
 
 const itemVar = {
   hidden: { opacity: 0, x: -10 },
-  show: { opacity: 1, x: 0 }
+  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
 export default function Investments({ db, onEdit, onDelete }: Props) {
@@ -42,8 +42,12 @@ export default function Investments({ db, onEdit, onDelete }: Props) {
   });
   
   const labels = Object.keys(tiposMap);
+  const translatedLabels = labels.map(tipo => {
+    const key = INV_TYPE_MAP[tipo];
+    return key ? t(key) : tipo;
+  });
   const chartData = {
-    labels,
+    labels: translatedLabels,
     datasets: [{
       data: Object.values(tiposMap),
       backgroundColor: COLORS.slice(0, labels.length),
@@ -65,6 +69,9 @@ export default function Investments({ db, onEdit, onDelete }: Props) {
                   responsive: true,
                   maintainAspectRatio: false,
                   cutout: '65%',
+                  layout: {
+                    padding: 8
+                  },
                   plugins: {
                     legend: {
                       position: window.innerWidth < 768 ? 'bottom' : 'right',
@@ -134,7 +141,7 @@ export default function Investments({ db, onEdit, onDelete }: Props) {
                   <div style={{ flex: 2 }}>
                     <div className="t-body-lg t-bold">{i.ativo}</div>
                     <div className="t-xs t-muted t-medium" style={{ marginTop: '2px' }}>
-                      {t(i.tipo) || i.tipo} · {i.qtd} {t('units')} · {formatCurrency(i.preco)}
+                      {INV_TYPE_MAP[i.tipo] ? t(INV_TYPE_MAP[i.tipo]) : i.tipo} · {i.qtd} {t('units')} · {formatCurrency(i.preco)}
                       {i.data && ` · ${dbService.formatDate(i.data)}`}
                     </div>
                   </div>

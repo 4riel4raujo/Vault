@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { dbService } from '../services/dbService';
 import { Lancamento, OperationType } from '../types';
 import { GenericModal } from './Modals';
+import { usePreferences } from '../contexts/PreferencesContext';
 
 interface Props {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface TempTransaction {
 }
 
 export default function CSVImportModal({ isOpen, onClose, onImport }: Props) {
+  const { t } = usePreferences();
   const [step, setStep] = useState(1);
   const [transacoes, setTransacoes] = useState<TempTransaction[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -85,7 +87,7 @@ export default function CSVImportModal({ isOpen, onClose, onImport }: Props) {
       items.push({
         id: 'l' + Date.now() + Math.floor(Math.random() * 1000) + i,
         data,
-        desc: cells[colDesc >= 0 ? colDesc : 1] || 'Transação',
+        desc: cells[colDesc >= 0 ? colDesc : 1] || t('csv_transaction_fallback') || 'Transação',
         valor: Math.abs(v),
         tipo: v < 0 ? OperationType.DESPESA : OperationType.RECEITA,
         cat: 'Outros',
@@ -135,37 +137,37 @@ export default function CSVImportModal({ isOpen, onClose, onImport }: Props) {
   };
 
   const confirmarImport = () => {
-    const sel = transacoes.filter(t => t.selecionado);
-    onImport(sel.map(t => ({
-      id: t.id,
-      tipo: t.tipo,
-      data: t.data,
-      valor: t.valor,
-      desc: t.desc,
-      cat: t.cat,
-      obs: 'Importado via CSV'
+    const sel = transacoes.filter(tItem => tItem.selecionado);
+    onImport(sel.map(tItem => ({
+      id: tItem.id,
+      tipo: tItem.tipo,
+      data: tItem.data,
+      valor: tItem.valor,
+      desc: tItem.desc,
+      cat: tItem.cat,
+      obs: t('imported_via_csv') || 'Importado via CSV'
     })));
     onClose();
     setStep(1);
     setTransacoes([]);
   };
 
-  const saveLabel = step === 1 ? 'Importar' : `Importar ${transacoes.filter(t => t.selecionado).length}`;
+  const saveLabel = step === 1 ? (t('import_csv') || 'Importar') : `${t('import_csv') || 'Importar'} (${transacoes.filter(tItem => tItem.selecionado).length})`;
 
   return (
     <GenericModal 
       isOpen={isOpen} 
       onClose={onClose} 
-      title="Importar CSV"
+      title={t('import_csv') || 'Importar CSV'}
       onSave={step === 2 ? confirmarImport : () => document.getElementById('csv-up')?.click()}
-      saveLabel={step === 1 ? 'Selecionar Arquivo' : saveLabel}
+      saveLabel={step === 1 ? (t('select_file') || 'Selecionar Arquivo') : saveLabel}
     >
       <div style={{ minWidth: '400px' }}>
         {step === 1 && (
           <div style={{ background: 'rgba(34,197,94,0.03)', border: '2px dashed #22C55E', padding: '40px', borderRadius: '24px', textAlign: 'center', cursor: 'pointer' }} onClick={() => document.getElementById('csv-up')?.click()}>
              <div style={{ fontSize: '42px', marginBottom: '12px' }}>📂</div>
-             <div style={{ fontWeight: 700, color: '#1a1a1a', fontSize: '16px' }}>Clique aqui ou arraste o arquivo CSV</div>
-             <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '8px' }}>Formatos suportados: .csv</div>
+             <div style={{ fontWeight: 700, color: 'var(--text)', fontSize: '16px' }}>{t('click_or_drag_csv') || 'Clique aqui ou arraste o arquivo CSV'}</div>
+             <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '8px' }}>{t('supported_formats') || 'Formatos suportados: .csv'}</div>
              <input type="file" id="csv-up" style={{ display: 'none' }} accept=".csv" onChange={(e) => e.target.files && handleFile(e.target.files[0])} />
           </div>
         )}
@@ -175,31 +177,31 @@ export default function CSVImportModal({ isOpen, onClose, onImport }: Props) {
             {isAnalyzing && (
               <div style={{ padding: '12px', background: 'rgba(0,230,118,0.1)', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#00843D', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div className="animate-spin" style={{ width: '14px', height: '14px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%' }} />
-                Categorizando transações com IA...
+                {t('categorizing_ai') || 'Categorizando transações com IA...'}
               </div>
             )}
-            <div style={{ maxHeight: '350px', overflowY: 'auto', borderRadius: '18px', border: '1px solid #eee' }}>
+            <div style={{ maxHeight: '350px', overflowY: 'auto', borderRadius: '18px', border: '1px solid var(--glass-border)' }}>
                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                 <thead style={{ background: '#f9f9f9', position: 'sticky', top: 0, zIndex: 10 }}>
+                 <thead style={{ background: 'var(--input-bg)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 10 }}>
                    <tr>
                      <th style={{ padding: '12px', textAlign: 'left', width: '40px' }}>✓</th>
-                     <th style={{ padding: '12px', textAlign: 'left' }}>Data</th>
-                     <th style={{ padding: '12px', textAlign: 'left' }}>Descrição</th>
-                     <th style={{ padding: '12px', textAlign: 'right' }}>Valor</th>
+                     <th style={{ padding: '12px', textAlign: 'left' }}>{t('csv_date') || 'Data'}</th>
+                     <th style={{ padding: '12px', textAlign: 'left' }}>{t('csv_description') || 'Descrição'}</th>
+                     <th style={{ padding: '12px', textAlign: 'right' }}>{t('csv_value') || 'Valor'}</th>
                    </tr>
                  </thead>
                  <tbody>
-                    {transacoes.map((t, idx) => (
-                      <tr key={t.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    {transacoes.map((tItem, idx) => (
+                      <tr key={tItem.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                         <td style={{ padding: '10px 12px' }}>
-                          <input type="checkbox" checked={t.selecionado} onChange={() => {
+                          <input type="checkbox" checked={tItem.selecionado} onChange={() => {
                             const n = [...transacoes]; n[idx].selecionado = !n[idx].selecionado; setTransacoes(n);
                           }} style={{ width: '16px', height: '16px' }} />
                         </td>
-                        <td style={{ padding: '10px 12px', color: 'var(--muted)', fontWeight: 500 }}>{dbService.formatDate(t.data)}</td>
-                        <td style={{ padding: '10px 12px', fontWeight: 600, maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.desc}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700 }} className={t.tipo === 'receita' ? 'pos' : 'neg'}>
-                          {dbService.formatCurrency(t.valor)}
+                        <td style={{ padding: '10px 12px', color: 'var(--muted)', fontWeight: 500 }}>{dbService.formatDate(tItem.data)}</td>
+                        <td style={{ padding: '10px 12px', fontWeight: 600, maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tItem.desc}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700 }} className={tItem.tipo === 'receita' ? 'pos' : 'neg'}>
+                          {dbService.formatCurrency(tItem.valor)}
                         </td>
                       </tr>
                     ))}
@@ -207,7 +209,7 @@ export default function CSVImportModal({ isOpen, onClose, onImport }: Props) {
                </table>
             </div>
             <button className="btn" onClick={() => setStep(1)} style={{ width: '100%', justifyContent: 'center', border: 'none', color: 'var(--muted)', fontWeight: 600 }}>
-              Voltar e trocar arquivo
+              {t('csv_back') || 'Voltar e trocar arquivo'}
             </button>
           </div>
         )}

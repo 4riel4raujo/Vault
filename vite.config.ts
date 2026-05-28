@@ -7,7 +7,7 @@ import {VitePWA} from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: '/',
+    base: process.env.GITHUB_PAGES === 'true' ? './' : './', // Suporte para subpastas no GitHub Pages
     plugins: [
       react(), 
       tailwindcss(),

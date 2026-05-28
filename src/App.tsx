@@ -295,7 +295,7 @@ function AppContent() {
         carteiraId: activeCarteiraId
       } as Lancamento, user.uid);
 
-      showToast(editInv ? 'Atualizado' : 'Adicionado');
+      showToast(editInv ? t('updated') : t('saved'));
       setLastSync(new Date());
     } finally {
       setIsSyncing(false);
@@ -315,7 +315,7 @@ function AppContent() {
     try {
       await dbService.saveCarteira({ ...data, id, userId: user.uid } as Carteira, user.uid);
       setActiveCarteiraId(id);
-      showToast(editCarteira ? 'Carteira atualizada' : 'Carteira criada');
+      showToast(editCarteira ? t('wallet_updated') : t('wallet_created'));
       setLastSync(new Date());
     } finally {
       setIsSyncing(false);
@@ -325,7 +325,7 @@ function AppContent() {
 
   const deleteCarteira = async (id: string) => {
     if (db.carteiras.length <= 1) {
-      alert('Você precisa ter pelo menos uma carteira.');
+      showToast(t('min_wallet_warning') || 'Você precisa ter pelo menos uma carteira.', 'erro');
       return;
     }
     setDeleteTargetId(id);
@@ -619,10 +619,10 @@ function AppContent() {
         <AnimatePresence mode="wait">
           <motion.div
             key={`${currentPage}-${activeCarteiraId}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, scale: 0.982, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.982, y: -10 }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
             className="page"
           >
             <div className="page-header lg-flex">
@@ -645,7 +645,7 @@ function AppContent() {
             
             {/* Mobile Title View (Only if not desktop) */}
             <div className="mobile-page-title lg-hidden" style={{ marginBottom: '20px' }}>
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   <h1 className="h2">
                     {navItems.find(n => n.id === currentPage)?.label}
                   </h1>
@@ -654,7 +654,7 @@ function AppContent() {
             </div>
 
             {currentPage === 'dashboard' && <Dashboard db={db} activeWall={activeWall} onViewMore={() => handlePageChange('lancamentos')} />}
-            {currentPage === 'planning' && <Planning />}
+            {currentPage === 'planning' && <Planning activeCarteiraId={activeCarteiraId} />}
             {currentPage === 'lancamentos' && (
               <Transactions 
                 db={db} 
@@ -674,7 +674,7 @@ function AppContent() {
               <WalletsPage 
                 db={db} 
                 activeCarteiraId={activeCarteiraId} 
-                onSelect={(id) => { setActiveCarteiraId(id); showToast('Carteira alterada'); }}
+                onSelect={(id) => { setActiveCarteiraId(id); showToast(t('wallet_changed')); }}
                 onEdit={(w) => { setEditCarteira(w); setActiveModal('carteira'); }}
                 onNew={() => { setEditCarteira(null); setActiveModal('carteira'); }}
               />

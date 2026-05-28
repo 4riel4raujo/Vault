@@ -33,10 +33,10 @@ export function GenericModal({ isOpen, onClose, title, children, onSave, onDelet
         >
             <motion.div 
               className="modal"
-              initial={{ scale: 0.9, opacity: 0, y: 40 }}
+              initial={{ scale: 0.96, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 40 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              exit={{ scale: 0.96, opacity: 0, y: 12 }}
+              transition={{ type: "spring", damping: 30, stiffness: 420 }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="modal-title">{title}</div>
@@ -54,23 +54,56 @@ export function GenericModal({ isOpen, onClose, title, children, onSave, onDelet
               >
                 {children}
               </motion.div>
-              <div className="modal-actions" style={{ marginTop: '32px' }}>
+              <div className="modal-actions" style={{ marginTop: '32px', display: 'flex', gap: '12px', width: '100%' }}>
                 {onDelete && (
-                  <button className="btn btn-danger" onClick={onDelete} style={{ marginRight: 'auto' }}>
+                  <button 
+                    className="btn btn-danger" 
+                    onClick={onDelete} 
+                    style={{ 
+                      flex: '1', 
+                      justifyContent: 'center',
+                      background: 'var(--red-g)',
+                      color: 'var(--red)',
+                      border: '1.5px solid rgba(239, 68, 68, 0.15)',
+                      padding: '12px 16px',
+                      borderRadius: 'var(--r-md)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
                     {t('delete')}
                   </button>
                 )}
                 <button 
                   className="btn" 
                   onClick={onClose}
-                  style={{ flex: 1, justifyContent: 'center' }}
+                  style={{ 
+                    flex: onDelete ? '1.2' : '1', 
+                    justifyContent: 'center',
+                    background: 'var(--bg-from, rgba(255, 255, 255, 0.9))',
+                    border: '1.5px solid var(--glass-border)',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--r-md)',
+                    color: 'var(--text)',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   {t('cancel')}
                 </button>
                 <button 
                   className={`btn btn-${saveVariant}`} 
                   onClick={onSave}
-                  style={{ flex: 1, justifyContent: 'center' }}
+                  style={{ 
+                    flex: onDelete ? '1.5' : '1.2', 
+                    justifyContent: 'center',
+                    background: 'var(--accent)',
+                    borderColor: 'var(--accent)',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--r-md)',
+                    color: '#ffffff',
+                    fontWeight: '700',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 14px rgba(0, 100, 45, 0.15)'
+                  }}
                 >
                   {saveLabel || t('save')}
                 </button>
@@ -93,7 +126,8 @@ interface LancamentoModalProps {
 }
 
 export function LancamentoModal({ isOpen, onClose, onSave, editData }: LancamentoModalProps) {
-  const { t } = usePreferences();
+  const { t, currency } = usePreferences();
+  const currencySymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'R$';
   const [tipo, setTipo] = useState<OperationType>(OperationType.DESPESA);
   const [data, setData] = useState(dbService.getToday());
   const [valor, setValor] = useState('');
@@ -159,9 +193,9 @@ export function LancamentoModal({ isOpen, onClose, onSave, editData }: Lancament
       </div>
       
       <div className="fr">
-        <div className="fg"><label>{t('data')}</label><input type="date" value={data} onChange={e => setData(e.target.value)} /></div>
+        <div className="fg"><label>{t('date')}</label><input type="date" value={data} onChange={e => setData(e.target.value)} /></div>
         <div className="fg">
-          <label>{t('value')} (R$)</label>
+          <label>{t('value')} ({currencySymbol})</label>
           <div style={{ position: 'relative' }}>
             <input 
               type="number" 
@@ -205,7 +239,8 @@ interface MetaModalProps {
 }
 
 export function MetaModal({ isOpen, onClose, onSave, editData }: MetaModalProps) {
-  const { t } = usePreferences();
+  const { t, currency } = usePreferences();
+  const currencySymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'R$';
   const [titulo, setTitulo] = useState('');
   const [valor, setValor] = useState('');
   const [atual, setAtual] = useState('');
@@ -233,8 +268,8 @@ export function MetaModal({ isOpen, onClose, onSave, editData }: MetaModalProps)
     <GenericModal isOpen={isOpen} onClose={onClose} title={editData ? t('edit_goal') : t('new_goal_modal')} onSave={handleSave}>
       <div className="fg"><label>{t('new_goal')}</label><input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder={t('placeholder_emergency_fund')} /></div>
       <div className="fr">
-        <div className="fg"><label>{t('target_value')} (R$)</label><input type="number" value={valor} onChange={e => setValor(e.target.value)} placeholder="0,00" /></div>
-        <div className="fg"><label>{t('already_saved')} (R$)</label><input type="number" value={atual} onChange={e => setAtual(e.target.value)} placeholder="0,00" /></div>
+        <div className="fg"><label>{t('target_value')} ({currencySymbol})</label><input type="number" value={valor} onChange={e => setValor(e.target.value)} placeholder="0,00" /></div>
+        <div className="fg"><label>{t('already_saved')} ({currencySymbol})</label><input type="number" value={atual} onChange={e => setAtual(e.target.value)} placeholder="0,00" /></div>
       </div>
       <div className="fr">
         <div className="fg"><label>{t('deadline')}</label><input type="date" value={prazo} onChange={e => setPrazo(e.target.value)} /></div>
@@ -267,7 +302,8 @@ interface InvModalProps {
 }
 
 export function InvModal({ isOpen, onClose, onSave, editData }: InvModalProps) {
-  const { t } = usePreferences();
+  const { t, currency } = usePreferences();
+  const currencySymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'R$';
   const [ativo, setAtivo] = useState('');
   const [tipo, setTipo] = useState('Ações');
   const [valor, setValor] = useState('');
@@ -331,11 +367,11 @@ export function InvModal({ isOpen, onClose, onSave, editData }: InvModalProps) {
       </div>
       <div className="fr">
         <div className="fg"><label>{t('contribution_date')}</label><input type="date" value={data} onChange={e => setData(e.target.value)} /></div>
-        <div className="fg"><label>{t('total_value')} (R$)</label><input type="number" value={valor} onChange={e => setValor(e.target.value)} placeholder="0,00" /></div>
+        <div className="fg"><label>{t('total_value')} ({currencySymbol})</label><input type="number" value={valor} onChange={e => setValor(e.target.value)} placeholder="0,00" /></div>
       </div>
       <div className="fr">
         <div className="fg"><label>{t('quantity')}</label><input type="number" value={qtd} onChange={e => setQtd(e.target.value)} placeholder="Ex: 100" /></div>
-        <div className="fg"><label>{t('average_price')} (R$)</label><input type="number" value={preco} onChange={e => setPreco(e.target.value)} placeholder="0,00" /></div>
+        <div className="fg"><label>{t('average_price')} ({currencySymbol})</label><input type="number" value={preco} onChange={e => setPreco(e.target.value)} placeholder="0,00" /></div>
       </div>
       <div className="fg">
         <label>{t('monthly_yield')} (%)</label>
@@ -405,8 +441,10 @@ export function CarteiraModal({ isOpen, onClose, onSave, onDelete, editData }: C
   const [razaoSocial, setRazaoSocial] = useState('');
   const [cpf, setCpf] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setError(null);
     if (isOpen && editData) {
       setNome(editData.nome);
       setTipo(editData.tipo);
@@ -428,13 +466,14 @@ export function CarteiraModal({ isOpen, onClose, onSave, onDelete, editData }: C
 
   const handleSave = () => {
     if (!nome) {
-      alert(t('wallet_name_required'));
+      setError(t('wallet_name_required') || 'Nome da carteira é obrigatório');
       return;
     }
     if (tipo === 'Empresarial' && (!cnpj || !razaoSocial)) {
-      alert(t('cnpj_razao_required'));
+      setError(t('cnpj_razao_required') || 'Razão Social e CNPJ são obrigatórios');
       return;
     }
+    setError(null);
     onSave({ 
       nome, 
       tipo, 
@@ -454,6 +493,23 @@ export function CarteiraModal({ isOpen, onClose, onSave, onDelete, editData }: C
       onSave={handleSave}
       onDelete={editData && onDelete ? () => { onDelete(editData.id); onClose(); } : undefined}
     >
+      {error && (
+        <div style={{ 
+          padding: '10px 14px', 
+          borderRadius: '12px', 
+          background: 'rgba(239, 68, 68, 0.12)', 
+          border: '1px solid rgba(239, 68, 68, 0.25)', 
+          color: '#ff4c4c', 
+          fontSize: '13px', 
+          fontWeight: '500', 
+          marginBottom: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px' 
+        }}>
+          <span style={{ fontSize: '15px' }}>⚠️</span> {error}
+        </div>
+      )}
       <div className="fg"><label>{t('wallet_name')}</label><input type="text" value={nome} onChange={e => setNome(e.target.value)} placeholder={t('placeholder_wallet')} /></div>
       <div className="fg">
         <label>{t('type')}</label>
@@ -468,16 +524,36 @@ export function CarteiraModal({ isOpen, onClose, onSave, onDelete, editData }: C
       </div>
 
       {tipo === 'Pessoal' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', background: 'var(--glass)', borderRadius: '12px', marginBottom: '16px', border: '1px solid var(--accent-low)' }}>
-          <div className="fg"><label>{t('full_name')}</label><input type="text" value={nomeCompleto} onChange={e => setNomeCompleto(e.target.value)} placeholder={t('full_name')} /></div>
-          <div className="fg"><label>{t('cpf')}</label><input type="text" value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00" /></div>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '16px', 
+          padding: '20px', 
+          background: 'var(--input-bg)', 
+          borderRadius: 'var(--r-md)', 
+          marginBottom: '20px', 
+          border: '1.5px solid var(--glass-border)',
+          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
+        }}>
+          <div className="fg" style={{ marginBottom: 0 }}><label>{t('full_name')}</label><input type="text" value={nomeCompleto} onChange={e => setNomeCompleto(e.target.value)} placeholder={t('full_name')} /></div>
+          <div className="fg" style={{ marginBottom: 0 }}><label>{t('cpf')}</label><input type="text" value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00" /></div>
         </div>
       )}
 
       {tipo === 'Empresarial' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px', background: 'var(--glass)', borderRadius: '12px', marginBottom: '16px', border: '1px solid var(--accent-low)' }}>
-          <div className="fg"><label>{t('business_name')}</label><input type="text" value={razaoSocial} onChange={e => setRazaoSocial(e.target.value)} placeholder={t('business_name')} /></div>
-          <div className="fg"><label>{t('cnpj')}</label><input type="text" value={cnpj} onChange={e => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" /></div>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '16px', 
+          padding: '20px', 
+          background: 'var(--input-bg)', 
+          borderRadius: 'var(--r-md)', 
+          marginBottom: '20px', 
+          border: '1.5px solid var(--glass-border)',
+          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
+        }}>
+          <div className="fg" style={{ marginBottom: 0 }}><label>{t('business_name')}</label><input type="text" value={razaoSocial} onChange={e => setRazaoSocial(e.target.value)} placeholder={t('business_name')} /></div>
+          <div className="fg" style={{ marginBottom: 0 }}><label>{t('cnpj')}</label><input type="text" value={cnpj} onChange={e => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" /></div>
         </div>
       )}
 

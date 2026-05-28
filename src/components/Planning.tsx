@@ -7,8 +7,13 @@ import { dbService } from '../services/dbService';
 import { ShoppingItem, GastoFixo, UserProfile } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
-const Planning: React.FC = () => {
-  const { t } = usePreferences();
+interface PlanningProps {
+  activeCarteiraId: string | null;
+}
+
+const Planning: React.FC<PlanningProps> = ({ activeCarteiraId }) => {
+  const { t, currency } = usePreferences();
+  const currencySymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'R$';
   const { user } = useAuth();
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
   const [fixedExpenses, setFixedExpenses] = useState<GastoFixo[]>([]);
@@ -25,37 +30,38 @@ const Planning: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    const unsubShopping = dbService.subscribeShoppingItems(user.uid, setShoppingItems);
-    const unsubFixed = dbService.subscribeGastosFixos(user.uid, setFixedExpenses);
+    const unsubShopping = dbService.subscribeShoppingItems(user.uid, (items) => {
+      const filtered = items.filter(item => item.carteiraId === (activeCarteiraId || undefined));
+      setShoppingItems(filtered);
+    });
+    const unsubFixed = dbService.subscribeGastosFixos(user.uid, (expenses) => {
+      const filtered = expenses.filter(exp => exp.carteiraId === (activeCarteiraId || undefined));
+      setFixedExpenses(filtered);
+    });
     const unsubProfile = dbService.subscribeUserProfile(user.uid, setUserProfile);
     
-    // Subscribe to all carteiras and total incomes to calculate salary commitment
-    const unsubCarteiras = dbService.subscribeCarteiras(user.uid, (carteiras) => {
-      const currentMonth = dbService.getCurrentMonth();
-      let totalSalaryFromTransactions = 0;
-      
-      const unsubs: (() => void)[] = [];
-      carteiras.forEach(c => {
-        const u = dbService.subscribeLancamentos(user.uid, c.id, (lancamentos) => {
-          const sal = lancamentos
-            .filter(l => l.data.startsWith(currentMonth) && (l.cat === 'Salário' || l.cat === 'salary'))
-            .reduce((sum, l) => sum + l.valor, 0);
-          totalSalaryFromTransactions += sal;
-          
-          setIncomes(userProfile?.rendimentoMensal || totalSalaryFromTransactions);
-        });
-        unsubs.push(u);
+    // Subscribe to current active wallet's salary transactions to calculate salary commitment
+    let unsubSalary = () => {};
+    if (activeCarteiraId) {
+      unsubSalary = dbService.subscribeLancamentos(user.uid, activeCarteiraId, (lancamentos) => {
+        const currentMonth = dbService.getCurrentMonth();
+        const sal = lancamentos
+          .filter(l => l.data.startsWith(currentMonth) && (l.cat === 'Salário' || l.cat === 'salary'))
+          .reduce((sum, l) => sum + l.valor, 0);
+        
+        setIncomes(userProfile?.rendimentoMensal || sal);
       });
-      return () => unsubs.forEach(u => u());
-    });
+    } else {
+      setIncomes(userProfile?.rendimentoMensal || 0);
+    }
 
     return () => {
       unsubShopping();
       unsubFixed();
       unsubProfile();
-      unsubCarteiras();
+      unsubSalary();
     };
-  }, [user, userProfile?.rendimentoMensal]);
+  }, [user, userProfile?.rendimentoMensal, activeCarteiraId]);
 
   const addShoppingItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +72,8 @@ const Planning: React.FC = () => {
       prioridade: newItemPriority,
       comprado: false,
       precoEstimado: parseFloat(newItemPrice) || 0,
-      userId: user.uid
+      userId: user.uid,
+      carteiraId: activeCarteiraId || undefined
     };
     await dbService.saveShoppingItem(item, user.uid);
     setNewItemName('');
@@ -93,7 +100,8 @@ const Planning: React.FC = () => {
       valor: parseFloat(newExpenseValue),
       diaVencimento: parseInt(newExpenseDue),
       categoria: 'Fixa',
-      userId: user.uid
+      userId: user.uid,
+      carteiraId: activeCarteiraId || undefined
     };
     await dbService.saveGastoFixo(gasto, user.uid);
     setNewExpenseName('');
@@ -156,7 +164,7 @@ const Planning: React.FC = () => {
             <input 
               type="number" 
               className="fg" 
-              placeholder="R$" 
+              placeholder={currencySymbol} 
               value={newExpenseValue}
               onChange={e => setNewExpenseValue(e.target.value)}
             />
@@ -169,7 +177,7 @@ const Planning: React.FC = () => {
               value={newExpenseDue}
               onChange={e => setNewExpenseDue(e.target.value)}
             />
-            <button type="submit" className="btn-primary" style={{ padding: '0 16px', height: '44px', borderRadius: 'var(--r-xl)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '0 16px', height: '44px', borderRadius: 'var(--r-xl)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Plus size={20} />
             </button>
           </form>
@@ -180,9 +188,10 @@ const Planning: React.FC = () => {
                 <motion.div 
                   layout
                   key={expense.id}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                   className="transaction-row"
                   style={{ 
                     padding: '14px 0',
@@ -298,7 +307,7 @@ const Planning: React.FC = () => {
               <input 
                 type="number" 
                 className="fg w-full"
-                placeholder={t('price_short') || 'R$'}
+                placeholder={t('price_short') || currencySymbol}
                 value={newItemPrice}
                 onChange={e => setNewItemPrice(e.target.value)}
               />
@@ -310,7 +319,7 @@ const Planning: React.FC = () => {
               className="w-auto"
               style={{ minWidth: '140px' }}
             />
-            <button type="submit" className="btn-primary" style={{ padding: '0 16px', height: '44px', borderRadius: 'var(--r-xl)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '0 16px', height: '44px', borderRadius: 'var(--r-xl)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Plus size={20} />
             </button>
           </form>
@@ -321,9 +330,10 @@ const Planning: React.FC = () => {
                 <motion.div 
                   layout
                   key={item.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                   className="transaction-row"
                   style={{ 
                     padding: '12px 0',
