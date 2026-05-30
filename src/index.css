@@ -158,6 +158,11 @@
 
 html, body {
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
   font-family: var(--sf);
   font-size: var(--fs-body-lg);
   color: var(--text);
@@ -167,6 +172,14 @@ html, body {
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Typography Scale Classes */
@@ -256,7 +269,7 @@ body::before {
 
 .app {
   display: flex;
-  height: 100dvh;
+  height: 100%;
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -1555,9 +1568,11 @@ option {
 
   .main-content {
     flex: 1;
+    overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: calc(70px + var(--safe-b)); /* Space for tab bar */
-    padding-top: calc(12px + var(--safe-t));
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); /* Space for tab bar */
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
   }
 
   .mobile-header {
@@ -1610,7 +1625,9 @@ option {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 6px 6px calc(6px + var(--safe-b));
+    padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
     background: var(--glass);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
