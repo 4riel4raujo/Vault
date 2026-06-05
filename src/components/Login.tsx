@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, UserPlus, Mail, Lock, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import AppIcon from './AppIcon';
-
+import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, TrendingUp, Target, ShieldCheck } from 'lucide-react';
+import Logo from './Logo';
 import { usePreferences } from '../contexts/PreferencesContext';
 
 export default function Login() {
   const { login, loginWithApple, loginWithEmail, registerWithEmail, resetPassword } = useAuth();
-  const { t } = usePreferences();
+  const { t, language } = usePreferences();
   const [isRegister, setIsRegister] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -27,10 +26,10 @@ export default function Login() {
       setSuccess(null);
       try {
         await resetPassword(email);
-        setSuccess(t('reset_email_sent'));
+        setSuccess(language === 'pt-BR' || language === 'pt' ? 'E-mail de recuperação enviado!' : t('reset_email_sent'));
       } catch (err: any) {
         console.error('Reset Error:', err);
-        setError(t('reset_email_err'));
+        setError(t('reset_email_err') || 'Erro ao enviar e-mail de recuperação.');
       } finally {
         setLoading(false);
       }
@@ -46,7 +45,6 @@ export default function Login() {
     
     setLoading(true);
     setError(null);
-    console.log('Attempting auth:', isRegister ? 'register' : 'login', email);
     try {
       if (isRegister) {
         await registerWithEmail(email, password);
@@ -64,21 +62,21 @@ export default function Login() {
           errorCode === 'invalid-credential' ||
           errorCode === 'auth/invalid-login-credentials' ||
           errorMsg.includes('auth/invalid-credential')) {
-        setError(t('invalid_credentials'));
+        setError(t('invalid_credentials') || 'Credenciais inválidas.');
       } else if (errorCode === 'auth/email-already-in-use') {
-        setError(t('email_in_use'));
+        setError(t('email_in_use') || 'Este e-mail já está em uso.');
       } else if (errorCode === 'auth/weak-password') {
-        setError(t('weak_password'));
+        setError(t('weak_password') || 'A senha é muito fraca.');
       } else if (errorCode === 'auth/invalid-email') {
-        setError(t('invalid_email_err'));
+        setError(t('invalid_email_err') || 'E-mail inválido.');
       } else if (errorCode === 'auth/network-request-failed') {
-        setError(t('connection_error'));
+        setError(t('connection_error') || 'Erro de conexão.');
       } else if (errorCode === 'auth/too-many-requests') {
-        setError(t('too_many_requests'));
+        setError(t('too_many_requests') || 'Muitas tentativas. Tente mais tarde.');
       } else if (errorCode === 'auth/operation-not-allowed') {
-        setError('O login por E-mail/Senha não está ativado no Firebase Console. Ative-o em Authentication > Sign-in method.');
+        setError('O login por E-mail/Senha não está ativado no Firebase Console. Ative-o em Authentication.');
       } else {
-        setError(t('generic_error') + ' (' + errorCode + ')');
+        setError((t('generic_error') || 'Erro ao autenticar') + ' (' + errorCode + ')');
       }
     } finally {
       setLoading(false);
@@ -93,14 +91,20 @@ export default function Login() {
     } catch (err: any) {
       console.error('Google Auth Error:', err);
       if (err.code === 'auth/popup-blocked') {
-        setError(t('popup_blocked_err') || 'Popup blocked. Please allow popups or open in a new tab.');
+        setError(t('popup_blocked_err') || 'Popup bloqueado. Por favor, ative os popups ou abra em nova aba.');
       } else if (err.code === 'auth/popup-closed-by-user') {
-        // Just stop loading, don't show error
+        if (language === 'en-US') {
+          setError('Google Auth was closed or blocked. If you are inside the AI Studio editor, please click the "Open in new window" button in the upper right corner to run the application in a full window and try again.');
+        } else if (language === 'es-ES') {
+          setError('El inicio de sesión de Google se cerró o bloqueó. Si se encontra dentro del editor de AI Studio, haga clic en el botón "Open in new window" en la esquina superior derecha para abrir el app en pantalla completa e inténtelo de nuevo.');
+        } else {
+          setError('O login do Google foi fechado ou bloqueado. Se você estiver dentro do editor do AI Studio, clique no botão "Open in new window" no canto superior direito para executar o aplicativo em uma janela cheia e tente novamente.');
+        }
       } else if (err.code === 'auth/unauthorized-domain') {
         const domain = window.location.hostname;
-        setError(`Domínio não autorizado (${domain}). Para corrigir, acesse o Console do Firebase > Authentication > Settings > Authorized domains e adicione este domínio.`);
+        setError(`Domínio não autorizado (${domain}). Adicione no console do Firebase.`);
       } else {
-        setError(t('google_error') + ' ' + (t('login_hint') || 'Tente abrir o app em uma nova aba se o problema persistir.'));
+        setError((t('google_error') || 'Erro com o Google.') + ' ' + (t('login_hint') || 'Tente em uma nova aba.'));
       }
     } finally {
       setLoading(false);
@@ -115,291 +119,551 @@ export default function Login() {
     } catch (err: any) {
       console.error('Apple Auth Error:', err);
       if (err.code === 'auth/popup-blocked') {
-        setError(t('popup_blocked_err') || 'Popup blocked. Please allow popups or open in a new tab.');
+        setError(t('popup_blocked_err') || 'Popup bloqueado. Por favor, ative os popups ou abra em nova aba.');
       } else if (err.code === 'auth/popup-closed-by-user') {
-        // Just stop loading, don't show error
+        if (language === 'en-US') {
+          setError('Apple Auth was closed or blocked. If you are inside the AI Studio editor, please click the "Open in new window" button in the upper right corner to run the application in a full window and try again.');
+        } else if (language === 'es-ES') {
+          setError('El inicio de sesión de Apple se cerró o bloqueó. Si se encontra dentro del editor de AI Studio, haga clic en el botón "Open in new window" en la esquina superior derecha para abrir el app en pantalla completa e inténtelo de nuevo.');
+        } else {
+          setError('O login da Apple foi fechado ou bloqueado. Se você estiver dentro do editor do AI Studio, clique no botão "Open in new window" no canto superior direito para executar o aplicativo em uma janela cheia e tente novamente.');
+        }
       } else if (err.code === 'auth/operation-not-allowed') {
-        setError('O login da Apple não está ativado ou configurado corretamente no Firebase Console.');
+        setError('O login da Apple não está ativado no Firebase Console.');
       } else if (err.code === 'auth/unauthorized-domain') {
         const domain = window.location.hostname;
-        setError(`Domínio não autorizado (${domain}). Adicione este domínio no Firebase Console (Authentication > Settings).`);
+        setError(`Domínio não autorizado (${domain}). Adicione no console do Firebase.`);
       } else {
-        setError(t('apple_error') + ' ' + (t('login_hint') || 'Tente abrir o app em uma nova aba se o problema persistir.'));
+        setError((t('apple_error') || 'Erro com a Apple.') + ' ' + (t('login_hint') || 'Tente em uma nova aba.'));
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const viewKey = isForgotPassword ? 'forgot' : (isRegister ? 'register' : 'login');
+
   return (
-    <div className="login-page">
-      <motion.div 
-        className="login-card"
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-      >
-        <AppIcon size={64} animate={true} className="mx-auto mb-4" />
+    <div 
+      className="absolute inset-0 min-h-screen w-full flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8 xl:px-12 overflow-y-auto"
+      style={{
+        backgroundImage: `url('/login_background.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Background ultra-soft subtle forest mist overlay */}
+      <div className="absolute inset-0 bg-[#0c1f13]/5 pointer-events-none" />
+
+      {/* Main Container - Holds Left Branding Column & Right Glass Login Card */}
+      <div className="relative w-full max-w-[1380px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 z-10 my-auto">
         
-        <motion.h1 
-          className="page-title" 
-          style={{ 
-            fontSize: '28px', 
-            textAlign: 'center', 
-            marginBottom: '2px',
-            fontFamily: '"Outfit", sans-serif',
-            fontWeight: 800,
-            letterSpacing: '2px',
-            color: 'var(--text)'
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Vault
-        </motion.h1>
-        
-        <motion.p 
-          className="page-sub" 
-          style={{ 
-            textAlign: 'center', 
-            marginBottom: '20px',
-            fontSize: '10px',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            fontWeight: 700,
-            opacity: 0.6
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          {t('smart_finance_management')}
-        </motion.p>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={isRegister ? 'register' : 'login'}
-            initial={{ opacity: 0, x: isRegister ? 10 : -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: isRegister ? -10 : 10 }}
-            transition={{ duration: 0.3 }}
-          >
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="input-field" style={{ marginBottom: '4px' }}>
-                <Mail size={16} className="input-icon" />
-                <input 
-                  type="email" 
-                  placeholder={t('email')} 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  required
-                />
-              </div>
-              
-              {!isForgotPassword && (
-                <div className="input-field" style={{ marginBottom: '8px' }}>
-                  <Lock size={16} className="input-icon" />
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder={t('password')} 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete={isRegister ? "new-password" : "current-password"}
-                    required
-                  />
-                  <button 
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              )}
-
-              <AnimatePresence mode="wait">
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="error-message"
-                  >
-                    <AlertCircle size={14} />
-                    <span>{error}</span>
-                  </motion.div>
-                )}
-                {success && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="success-message"
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '8px', 
-                      color: 'var(--accent)', 
-                      fontSize: '12px', 
-                      background: 'var(--accent-low/10)',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      marginBottom: '8px'
-                    }}
-                  >
-                    <AlertCircle size={14} />
-                    <span>{success}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {!isRegister && !isForgotPassword && (
-                <button 
-                  type="button" 
-                  onClick={() => setIsForgotPassword(true)}
-                  style={{ 
-                    alignSelf: 'flex-end', 
-                    fontSize: '12px', 
-                    color: 'var(--muted)', 
-                    background: 'none', 
-                    border: 'none', 
-                    cursor: 'pointer',
-                    padding: '0 4px',
-                    marginTop: '-4px',
-                    marginBottom: '4px'
-                  }}
-                >
-                  {t('forgot_password')}
-                </button>
-              )}
-
-              {isForgotPassword && (
-                <button 
-                  type="button" 
-                  onClick={() => { setIsForgotPassword(false); setSuccess(null); setError(null); }}
-                  style={{ 
-                    alignSelf: 'flex-end', 
-                    fontSize: '12px', 
-                    color: 'var(--muted)', 
-                    background: 'none', 
-                    border: 'none', 
-                    cursor: 'pointer',
-                    padding: '0 4px',
-                    marginTop: '-4px',
-                    marginBottom: '4px'
-                  }}
-                >
-                  {t('back_to_login')}
-                </button>
-              )}
-
-              <motion.button 
-                type="submit"
-                className="btn btn-primary" 
-                style={{ 
-                  width: '100%', 
-                  padding: '14px', 
-                  borderRadius: '16px',
-                  justifyContent: 'center',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  marginTop: '8px'
-                }} 
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {loading ? <Loader2 className="animate-spin" size={18} /> : (isForgotPassword ? t('send_reset_email') : (isRegister ? t('create_account') : t('login')))}
-              </motion.button>
-            </form>
-          </motion.div>
-        </AnimatePresence>
-
-        {!isForgotPassword && (
-          <>
-            <div className="divider" style={{ margin: '14px 0' }}>
-              <span>{t('or')}</span>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <motion.button 
-                className="btn btn-secondary" 
-                style={{ 
-                  flex: 1,
-                  padding: '12px', 
-                  borderRadius: '12px',
-                  justifyContent: 'center',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  background: 'var(--glass-strong)',
-                  border: '1px solid var(--glass-border)'
-                }} 
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <img 
-                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                  alt="Google" 
-                  style={{ width: '16px', height: '16px', marginRight: '8px' }} 
-                />
-                Google
-              </motion.button>
-
-              <motion.button 
-                className="btn btn-secondary" 
-                style={{ 
-                  flex: 1,
-                  padding: '12px', 
-                  borderRadius: '12px',
-                  justifyContent: 'center',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  background: 'var(--glass-strong)',
-                  border: '1px solid var(--glass-border)'
-                }} 
-                onClick={handleAppleLogin}
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <svg viewBox="0 0 384 512" style={{ width: '16px', height: '16px', marginRight: '8px', fill: 'currentColor' }}>
-                  <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
-                </svg>
-                Apple
-              </motion.button>
-            </div>
-
-            <div style={{ marginTop: '16px', textAlign: 'center' }}>
-              <button 
-                type="button"
-                className="link-btn"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  setError(null);
-                  setSuccess(null);
-                }}
-                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--green)' }}
-              >
-                {isRegister ? t('have_account') : t('no_account')}
-              </button>
-            </div>
-          </>
-        )}
-        
+        {/* Left Column: Branding and Features List */}
         <motion.div 
-          style={{ marginTop: '24px', textAlign: 'center', fontSize: '10px', color: 'var(--muted)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          className="relative flex flex-col w-full lg:w-[54%] justify-start gap-y-10 py-4 lg:py-8 pr-0 lg:pr-6 select-none text-left"
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          {t('protected_by')}
-        </motion.div>
-      </motion.div>
+          {/* Soft, light mist gradient overlay matching background landscape tones to guarantee text legibility */}
+          <div className="absolute -inset-x-6 sm:-inset-x-10 -inset-y-6 lg:-inset-x-14 lg:-inset-y-10 bg-gradient-to-br from-[#f3faf6]/70 via-[#e4f2ea]/45 to-transparent rounded-[48px] blur-3xl -z-10 pointer-events-none" />
+          
+          {/* Logo brand row matching screenshot exactly */}
+          <div className="flex items-center gap-3.5">
+            <Logo size={52} />
+            <div>
+              <h1 className="text-[34px] font-extrabold tracking-tight text-[#0c2f1d] font-sans antialiased leading-none">Vault</h1>
+              <p className="text-[10px] tracking-[0.25em] font-black text-[#15803d] uppercase leading-none mt-1">Smart Finance</p>
+            </div>
+          </div>
 
+          {/* Slogan & Subtitle */}
+          <div className="py-2">
+            <h2 className="text-[32px] lg:text-[38px] font-extrabold text-[#0c2f1d] tracking-tight leading-[1.28] max-w-xl mb-5 antialiased">
+              Gestão financeira com mais controle, <span className="text-[#12a14b] font-extrabold block sm:inline">clareza e segurança</span>
+            </h2>
+            <p className="text-[#2d4d3a]/85 text-[15.5px] font-semibold leading-relaxed max-w-xl antialiased">
+              Tecnologia inteligente para controlar receitas, despesas, planejar investimentos e acompanhar sua evolução patrimonial em tempo real.
+            </p>
+          </div>
+
+          {/* Feature Lists matching screenshot closely */}
+          <div className="flex flex-col gap-y-9 max-w-xl mt-10">
+            {/* Feature 1 */}
+            <div className="flex items-start gap-5">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 flex items-center justify-center text-[#1c5f32] shadow-sm">
+                <TrendingUp size={22} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-extrabold text-[16px] text-[#0c2f1d] leading-snug">Fluxo de Caixa Inteligente</h3>
+                <p className="text-sm text-[#3d5c4b]/95 mt-1 leading-relaxed">Acompanhe entradas, saídas e saldo em tempo real com clareza.</p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="flex items-start gap-5">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 flex items-center justify-center text-[#1c5f32] shadow-sm">
+                <Target size={22} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-extrabold text-[16px] text-[#0c2f1d] leading-snug">Planejamento de Investimentos</h3>
+                <p className="text-sm text-[#3d5c4b]/95 mt-1 leading-relaxed">Organize seus objetivos e invista com estratégia e segurança.</p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex items-start gap-5">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 flex items-center justify-center text-[#1c5f32] shadow-sm">
+                <ShieldCheck size={22} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-extrabold text-[16px] text-[#0c2f1d] leading-snug">Segurança de Alto Nível</h3>
+                <p className="text-sm text-[#3d5c4b]/95 mt-1 leading-relaxed">Seus dados protegidos com criptografia de nível bancário.</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Right Column: Frosted Glassmorphism Login Card Form */}
+        <div className="w-full lg:w-[42%] flex flex-col items-center lg:items-end justify-center">
+          <motion.div 
+            className="relative w-full max-w-[460px] bg-white/[0.14] backdrop-blur-[28px] border border-white/30 shadow-[0_32px_64px_-16px_rgba(8,30,16,0.18)] rounded-[44px] flex flex-col justify-center overflow-hidden z-10"
+            style={{
+              paddingLeft: '38px',
+              paddingRight: '38px',
+              paddingTop: '28px',
+              paddingBottom: '52px'
+            }}
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isForgotPassword ? (
+                <motion.div
+                  key="forgot-password"
+                  initial={{ opacity: 0, x: 18, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, x: -18, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full flex flex-col"
+                >
+                  {/* Header / Intro */}
+                  <div className="mb-11 select-none text-center">
+                    <h3 className="text-[32px] font-extrabold text-[#0c2f1d]/95 tracking-tight leading-none antialiased">
+                      Recuperar senha
+                    </h3>
+                    <p className="text-[13px] text-[#2d4d3a] mt-2 antialiased font-semibold tracking-normal">
+                      Digite seu e-mail para continuar no Vault
+                    </p>
+                  </div>
+
+                  {/* Alert Boxes inside motion block */}
+                  {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+                  {success && (
+                    <div className="bg-emerald-600/10 border border-emerald-600/20 text-emerald-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{success}</span>
+                    </div>
+                  )}
+
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+                    {/* Email field */}
+                    <div>
+                      <label className="block text-[10px] font-extrabold tracking-[0.16em] !text-[#0c2d1c] mb-2 uppercase select-none text-left">
+                        E-mail
+                      </label>
+                      <div className="relative flex items-center">
+                        <Mail size={18} className="absolute left-[18px] !text-[#0c2d1c]/80 pointer-events-none z-10" />
+                        <input
+                          type="email"
+                          placeholder="Seu email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full h-[54px] bg-white/20 hover:bg-white/25 focus:bg-white/30 border border-white/35 focus:border-[#22c55e]/45 rounded-[18px] !pl-[52px] !pr-5 !text-[#0c2d1c] font-semibold placeholder-[#2d4d3a]/65 outline-none transition duration-200 text-[14.5px] shadow-sm backdrop-blur-md"
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Spacing for layout alignment */}
+                    <div className="h-5" />
+
+                    {/* Back to login option */}
+                    <div className="text-right select-none">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPassword(false);
+                          setError(null);
+                          setSuccess(null);
+                        }}
+                        className="text-[#0e4224] hover:text-[#1c5f2b] text-[13.5px] font-bold tracking-tight hover:underline transition duration-150"
+                      >
+                        Voltar para o login
+                      </button>
+                    </div>
+
+                    {/* Submit Button */}
+                    <motion.button
+                      type="submit"
+                      className="w-full h-[54px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg shadow-[#12552b]/20 hover:shadow-[#12552b]/30 rounded-[18px] font-extrabold tracking-[0.12em] text-[15px] flex items-center justify-center gap-2 transition-all duration-200 mt-2.5 uppercase text-center"
+                      disabled={loading}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {loading ? (
+                        <Loader2 className="animate-spin text-white" size={20} />
+                      ) : (
+                        <div className="flex items-center justify-center mx-auto">
+                          <span>Enviar link</span>
+                        </div>
+                      )}
+                    </motion.button>
+                  </form>
+                </motion.div>
+              ) : isRegister ? (
+                <motion.div
+                  key="register"
+                  initial={{ opacity: 0, x: 18, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, x: -18, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full flex flex-col"
+                >
+                  {/* Header / Intro */}
+                  <div className="mb-11 select-none text-center">
+                    <h3 className="text-[32px] font-extrabold text-[#0c2f1d]/95 tracking-tight leading-none antialiased">
+                      Crie sua conta
+                    </h3>
+                    <p className="text-[13px] text-[#2d4d3a] mt-2 antialiased font-semibold tracking-normal">
+                      Entre com seus dados para se cadastrar
+                    </p>
+                  </div>
+
+                  {/* Alert Boxes */}
+                  {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+                  {success && (
+                    <div className="bg-emerald-600/10 border border-emerald-600/20 text-emerald-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{success}</span>
+                    </div>
+                  )}
+
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+                    {/* Email field */}
+                    <div>
+                      <label className="block text-[10px] font-extrabold tracking-[0.16em] !text-[#0c2d1c] mb-2 uppercase select-none text-left">
+                        E-mail
+                      </label>
+                      <div className="relative flex items-center">
+                        <Mail size={18} className="absolute left-[18px] !text-[#0c2d1c]/80 pointer-events-none z-10" />
+                        <input
+                          type="email"
+                          placeholder="Seu melhor email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full h-[54px] bg-white/20 hover:bg-white/25 focus:bg-white/30 border border-white/35 focus:border-[#22c55e]/45 rounded-[18px] !pl-[52px] !pr-5 !text-[#0c2d1c] font-semibold placeholder-[#2d4d3a]/65 outline-none transition duration-200 text-[14.5px] shadow-sm backdrop-blur-md"
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password field */}
+                    <div>
+                      <label className="block text-[10px] font-extrabold tracking-[0.16em] !text-[#0c2d1c] mb-2 uppercase select-none text-left">
+                        Senha
+                      </label>
+                      <div className="relative flex items-center">
+                        <Lock size={18} className="absolute left-[18px] !text-[#0c2d1c]/80 pointer-events-none z-10" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Crie uma senha forte"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full h-[54px] bg-white/20 hover:bg-white/25 focus:bg-white/30 border border-white/35 focus:border-[#22c55e]/45 rounded-[18px] !pl-[52px] !pr-[52px] !text-[#0c2d1c] font-semibold placeholder-[#2d4d3a]/65 outline-none transition duration-200 text-[14.5px] shadow-sm backdrop-blur-md"
+                          autoComplete="new-password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-5 !text-[#0c2d1c]/70 hover:!text-[#0c2d1c] transition duration-150"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Spacing for layout alignment */}
+                    <div className="h-5" />
+
+                    {/* Submit Button */}
+                    <motion.button
+                      type="submit"
+                      className="w-full h-[54px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg shadow-[#12552b]/20 hover:shadow-[#12552b]/30 rounded-[18px] font-extrabold tracking-[0.12em] text-[15px] flex items-center justify-center gap-2 transition-all duration-200 mt-2.5 uppercase text-center"
+                      disabled={loading}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {loading ? (
+                        <Loader2 className="animate-spin text-white" size={20} />
+                      ) : (
+                        <div className="flex items-center justify-center mx-auto">
+                          <span>Criar Conta</span>
+                        </div>
+                      )}
+                    </motion.button>
+                  </form>
+
+                  {/* Separador e Social Providers */}
+                  <div className="w-full">
+                    <div className="flex items-center my-9 select-none">
+                      <div className="flex-grow border-t border-white/20"></div>
+                      <span className="mx-4 text-[10px] font-extrabold text-[#2d4d3a]/80 uppercase tracking-[0.2em]">ou</span>
+                      <div className="flex-grow border-t border-white/20"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <motion.button
+                        type="button"
+                        className="flex items-center justify-center gap-2.5 h-12 border border-white/20 bg-transparent rounded-[16px] text-sm font-extrabold text-white transition-all duration-200 shadow-sm cursor-pointer"
+                        onClick={handleGoogleLogin}
+                        disabled={loading}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <img
+                          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                          alt="Google"
+                          className="w-[18px] h-[18px]"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span>Google</span>
+                      </motion.button>
+
+                      <motion.button
+                        type="button"
+                        className="flex items-center justify-center gap-2.5 h-12 border border-white/20 bg-transparent rounded-[16px] text-sm font-extrabold text-white transition-all duration-200 shadow-sm cursor-pointer"
+                        onClick={handleAppleLogin}
+                        disabled={loading}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <svg viewBox="0 0 384 512" className="w-[15px] h-[15px] fill-white">
+                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                        </svg>
+                        <span>Apple</span>
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  {/* Alternate Screen Toggle */}
+                  <div className="mt-24 text-center select-none">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRegister(false);
+                        setIsForgotPassword(false);
+                        setError(null);
+                        setSuccess(null);
+                      }}
+                      className="text-[#2d4d3a]/90 hover:text-[#0c2f1d]/100 text-[13.5px] font-bold tracking-tight transition duration-150"
+                    >
+                      Já tem uma conta? <span className="text-[#135d25] underline decoration-[#135d25] decoration-2 underline-offset-4 font-extrabold">Conecte-se</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, x: 18, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, x: -18, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full flex flex-col"
+                >
+                  {/* Header / Intro */}
+                  <div className="mb-11 select-none text-center">
+                    <h3 className="text-[32px] font-extrabold text-[#0c2f1d]/95 tracking-tight leading-none antialiased">
+                      Acesse sua conta
+                    </h3>
+                    <p className="text-[13px] text-[#2d4d3a] mt-2 antialiased font-semibold tracking-normal">
+                      Entre com seus dados para continuar no Vault
+                    </p>
+                  </div>
+
+                  {/* Alert Boxes */}
+                  {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+                  {success && (
+                    <div className="bg-emerald-600/10 border border-emerald-600/20 text-emerald-900 p-3.5 rounded-[18px] text-xs font-bold flex items-center gap-2 mb-4">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{success}</span>
+                    </div>
+                  )}
+
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+                    {/* Email field */}
+                    <div>
+                      <label className="block text-[10px] font-extrabold tracking-[0.16em] !text-[#0c2d1c] mb-2 uppercase select-none text-left">
+                        E-mail
+                      </label>
+                      <div className="relative flex items-center">
+                        <Mail size={18} className="absolute left-[18px] !text-[#0c2d1c]/80 pointer-events-none z-10" />
+                        <input
+                          type="email"
+                          placeholder="Seu email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full h-[54px] bg-white/20 hover:bg-white/25 focus:bg-white/30 border border-white/35 focus:border-[#22c55e]/45 rounded-[18px] !pl-[52px] !pr-5 !text-[#0c2d1c] font-semibold placeholder-[#2d4d3a]/65 outline-none transition duration-200 text-[14.5px] shadow-sm backdrop-blur-md"
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password field */}
+                    <div>
+                      <label className="block text-[10px] font-extrabold tracking-[0.16em] !text-[#0c2d1c] mb-2 uppercase select-none text-left">
+                        Senha
+                      </label>
+                      <div className="relative flex items-center">
+                        <Lock size={18} className="absolute left-[18px] !text-[#0c2d1c]/80 pointer-events-none z-10" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Digite sua senha"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full h-[54px] bg-white/20 hover:bg-white/25 focus:bg-white/30 border border-white/35 focus:border-[#22c55e]/45 rounded-[18px] !pl-[52px] !pr-[52px] !text-[#0c2d1c] font-semibold placeholder-[#2d4d3a]/65 outline-none transition duration-200 text-[14.5px] shadow-sm backdrop-blur-md"
+                          autoComplete="current-password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-5 !text-[#0c2d1c]/70 hover:!text-[#0c2d1c] transition duration-150"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Forgot Password Container */}
+                    <div className="text-right select-none h-5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPassword(true);
+                          setError(null);
+                          setSuccess(null);
+                        }}
+                        className="text-[#0e4224] hover:text-[#1c5f2b] text-[13.5px] font-bold tracking-tight hover:underline transition duration-150"
+                      >
+                        Esqueceu a senha?
+                      </button>
+                    </div>
+
+                    {/* Submit Button */}
+                    <motion.button
+                      type="submit"
+                      className="w-full h-[54px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg shadow-[#12552b]/20 hover:shadow-[#12552b]/30 rounded-[18px] font-extrabold tracking-[0.12em] text-[15px] flex items-center justify-center gap-2 transition-all duration-200 mt-2.5 uppercase text-center"
+                      disabled={loading}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {loading ? (
+                        <Loader2 className="animate-spin text-white" size={20} />
+                      ) : (
+                        <div className="flex items-center justify-center mx-auto">
+                          <span>Entrar</span>
+                        </div>
+                      )}
+                    </motion.button>
+                  </form>
+
+                  {/* Separador e Social Providers */}
+                  <div className="w-full">
+                    <div className="flex items-center my-9 select-none">
+                      <div className="flex-grow border-t border-white/20"></div>
+                      <span className="mx-4 text-[10px] font-extrabold text-[#2d4d3a]/80 uppercase tracking-[0.2em]">ou</span>
+                      <div className="flex-grow border-t border-white/20"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <motion.button
+                        type="button"
+                        className="flex items-center justify-center gap-2.5 h-12 border border-white/20 bg-transparent rounded-[16px] text-sm font-extrabold text-white transition-all duration-200 shadow-sm cursor-pointer"
+                        onClick={handleGoogleLogin}
+                        disabled={loading}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <img
+                          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                          alt="Google"
+                          className="w-[18px] h-[18px]"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span>Google</span>
+                      </motion.button>
+
+                      <motion.button
+                        type="button"
+                        className="flex items-center justify-center gap-2.5 h-12 border border-white/20 bg-transparent rounded-[16px] text-sm font-extrabold text-white transition-all duration-200 shadow-sm cursor-pointer"
+                        onClick={handleAppleLogin}
+                        disabled={loading}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <svg viewBox="0 0 384 512" className="w-[15px] h-[15px] fill-white">
+                          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                        </svg>
+                        <span>Apple</span>
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  {/* Alternate Screen Toggle */}
+                  <div className="mt-24 text-center select-none">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRegister(true);
+                        setIsForgotPassword(false);
+                        setError(null);
+                        setSuccess(null);
+                      }}
+                      className="text-[#2d4d3a]/90 hover:text-[#0c2f1d]/100 text-[13.5px] font-bold tracking-tight transition duration-150"
+                    >
+                      Não tem uma conta? <span className="text-[#135d25] underline decoration-[#135d25] decoration-2 underline-offset-4 font-extrabold">Crie agora</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+
+      </div>
+
+      {/* Elegant minimalist bottom footer credits - aligned left */}
+      <div className="absolute bottom-6 left-6 md:left-12 text-[10px] tracking-[0.16em] text-[#2d4d3a]/75 font-extrabold uppercase select-none z-10">
+        © 2026 Vault Inc. • Todos os direitos reservados
+      </div>
     </div>
   );
 }
