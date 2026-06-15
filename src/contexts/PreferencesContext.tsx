@@ -9,9 +9,11 @@ interface PreferencesContextType {
   currency: Currency;
   themeMode: ThemeMode;
   isDark: boolean;
+  showBalances: boolean;
   setLanguage: (lang: Language) => void;
   setCurrency: (curr: Currency) => void;
   setThemeMode: (mode: ThemeMode) => void;
+  setShowBalances: (show: boolean) => void;
   formatCurrency: (value: number) => string;
   t: (key: string) => string;
 }
@@ -232,6 +234,7 @@ const translations: Record<Language, Record<string, string>> = {
     'extras': 'Extras',
     'etfs': 'ETFs',
     'savings': 'Poupança',
+    'other_assets': 'Outros ativos',
     'updated': 'Atualizado',
     'saved': 'Salvo',
     'created': 'Criada',
@@ -543,6 +546,7 @@ const translations: Record<Language, Record<string, string>> = {
     'extras': 'Extras',
     'etfs': 'ETFs',
     'savings': 'Savings',
+    'other_assets': 'Other assets',
     'updated': 'Updated',
     'saved': 'Saved',
     'created': 'Created',
@@ -854,6 +858,7 @@ const translations: Record<Language, Record<string, string>> = {
     'extras': 'Extras',
     'etfs': 'ETFs',
     'savings': 'Ahorros',
+    'other_assets': 'Otros activos',
     'updated': 'Actualizado',
     'saved': 'Guardado',
     'created': 'Creada',
@@ -959,6 +964,10 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   const [currency, setCurrencyState] = useState<Currency>((localStorage.getItem('app-currency') as Currency) || 'BRL');
   const [themeMode, setThemeModeState] = useState<ThemeMode>((localStorage.getItem('app-theme-mode') as ThemeMode) || 'auto');
   const [isDark, setIsDark] = useState(false);
+  const [showBalances, setShowBalancesState] = useState<boolean>(() => {
+    const val = localStorage.getItem('app-show-balances');
+    return val !== 'false';
+  });
 
   useEffect(() => {
     const applyTheme = () => {
@@ -1009,6 +1018,11 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     localStorage.setItem('app-theme-mode', mode);
   };
 
+  const setShowBalances = (show: boolean) => {
+    setShowBalancesState(show);
+    localStorage.setItem('app-show-balances', String(show));
+  };
+
   const formatCurrency = (value: number) => {
     const locales: Record<Currency, string> = {
       BRL: 'pt-BR',
@@ -1039,8 +1053,8 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
 
   return (
     <PreferencesContext.Provider value={{ 
-      language, currency, themeMode, isDark,
-      setLanguage, setCurrency, setThemeMode,
+      language, currency, themeMode, isDark, showBalances,
+      setLanguage, setCurrency, setThemeMode, setShowBalances,
       formatCurrency, t
     }}>
       {children}

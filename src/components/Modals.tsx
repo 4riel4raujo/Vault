@@ -361,7 +361,8 @@ export function InvModal({ isOpen, onClose, onSave, editData }: InvModalProps) {
             { value: 'FIIs', label: t('fiis') },
             { value: 'Tesouro', label: t('treasury') },
             { value: 'Cripto', label: t('crypto') },
-            { value: 'Renda Fixa', label: t('fixed_income') }
+            { value: 'Renda Fixa', label: t('fixed_income') },
+            { value: 'Outros Ativos', label: t('other_assets') }
           ]}
         />
       </div>

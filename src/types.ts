@@ -99,7 +99,7 @@ export interface DBState {
 export const CATS = {
   [OperationType.RECEITA]: ['Salário', 'Freelance', 'Aluguel recebido', 'Investimentos', 'Presente', 'Outros'],
   [OperationType.DESPESA]: ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Academia', 'Lazer', 'Educação', 'Vestuário', 'Serviços', 'Assinaturas', 'Extras', 'Outros'],
-  [OperationType.INVESTIMENTO]: ['Renda Fixa', 'Ações', 'FIIs', 'Cripto', 'Tesouro', 'ETFs', 'Poupança'],
+  [OperationType.INVESTIMENTO]: ['Renda Fixa', 'Ações', 'FIIs', 'Cripto', 'Tesouro', 'ETFs', 'Poupança', 'Outros Ativos'],
 };
 
 export const COLORS = [
@@ -114,7 +114,8 @@ export const CAT_MAP: Record<string, string> = {
   'Saúde': 'health', 'Academia': 'gym', 'Lazer': 'leisure', 'Educação': 'education',
   'Vestuário': 'clothing', 'Serviços': 'services', 'Assinaturas': 'subscriptions',
   'Extras': 'extras', 'Renda Fixa': 'fixed_income', 'Ações': 'stocks', 'FIIs': 'fiis',
-  'Tesouro': 'treasury', 'Cripto': 'crypto', 'ETFs': 'etfs', 'Poupança': 'savings'
+  'Tesouro': 'treasury', 'Cripto': 'crypto', 'ETFs': 'etfs', 'Poupança': 'savings',
+  'Outros Ativos': 'other_assets', 'Outros ativos': 'other_assets'
 };
 
 export const INV_TYPE_MAP: Record<string, string> = {
@@ -124,7 +125,9 @@ export const INV_TYPE_MAP: Record<string, string> = {
   'Tesouro': 'treasury',
   'Cripto': 'crypto',
   'ETFs': 'etfs',
-  'Poupança': 'savings'
+  'Poupança': 'savings',
+  'Outros Ativos': 'other_assets',
+  'Outros ativos': 'other_assets'
 };
 
 export const COLOR_MAP: Record<string, string> = {

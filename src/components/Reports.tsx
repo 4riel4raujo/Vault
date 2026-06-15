@@ -29,7 +29,7 @@ export default function Reports({ db, onExportCSV }: Props) {
   const tudo = dbService.getTotais(db.lancamentos);
   const totalValue = db.investimentos.reduce((s, i) => s + i.valor, 0);
   const taxaPoupanca = tudo.rec > 0 ? ((tudo.rec - tudo.desp) / tudo.rec * 100).toFixed(1) : '0.0';
-  const totPatrimonio = tudo.saldo + totalValue;
+  const totPatrimonio = tudo.saldo - tudo.inv + totalValue;
 
   const metrics = [
     { label: t('total_income'), val: formatCurrency(tudo.rec), cls: 'pos' },
@@ -62,7 +62,7 @@ export default function Reports({ db, onExportCSV }: Props) {
   const historyVals: number[] = [];
   last6Months.forEach(m => {
     const monthTotal = dbService.getTotais(db.lancamentos, m);
-    cumulativeSaldo += monthTotal.rec - monthTotal.desp;
+    cumulativeSaldo += monthTotal.rec - monthTotal.desp - monthTotal.inv;
     
     // Calculate investments up to this month
     const invUpToMonth = db.investimentos
@@ -73,7 +73,7 @@ export default function Reports({ db, onExportCSV }: Props) {
         }
         return dbService.getMonthKey(i.data) <= m;
       })
-      .reduce((s, i) => s + (i.qtd * i.preco), 0);
+      .reduce((s, i) => s + i.valor, 0);
 
     historyVals.push(cumulativeSaldo + invUpToMonth);
   });
