@@ -157,15 +157,22 @@ export default function Login() {
 
   return (
     <div 
-      className="absolute inset-0 min-h-screen w-full flex flex-col transition-colors duration-500 overflow-y-auto"
+      className="fixed inset-0 w-full h-full transition-colors duration-500 overflow-hidden"
       style={{
-        backgroundImage: isDark ? `url('/login_background_dark.png')` : `url('/login_background.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
         backgroundColor: isDark ? '#04120C' : '#f0f6f3'
       }}
     >
+      {/* Background stabilized forest image */}
+      <div 
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{
+          backgroundImage: isDark ? `url('/login_background_dark.png')` : `url('/login_background.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          zIndex: 0
+        }}
+      />
       {/* Background premium forest overlay, balanced transparency to keep image beautifully visible */}
       <div 
         className="fixed inset-0 pointer-events-none transition-opacity duration-700"
@@ -236,7 +243,7 @@ export default function Login() {
         >
           {/* Soft ambient mist overlay behind branding to ensure readability without any hard borders or shapes */}
           <div 
-            className="absolute -inset-x-24 -inset-y-24 blur-[80px] -z-10 pointer-events-none transition-all duration-500"
+            className="absolute lg:-inset-x-24 lg:-inset-y-24 -inset-x-6 -inset-y-6 blur-[80px] -z-10 pointer-events-none transition-all duration-500"
             style={{
               background: isDark 
                 ? 'radial-gradient(circle at center, rgba(4, 18, 12, 0.85) 0%, rgba(4, 18, 12, 0) 80%)' 

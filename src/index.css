@@ -7,8 +7,8 @@
 
 :root, .light {
   --sf: "Plus Jakarta Sans", "Inter", -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-  --bg-from: #d4eddc;
-  --bg-to: #ddf0e4;
+  --bg-from: #edf3f0;
+  --bg-to: #edf3f0;
   --glass: rgba(255, 255, 255, 0.52);
   --glass-strong: rgba(255, 255, 255, 0.80);
   --glass-border: rgba(255, 255, 255, 0.72);
@@ -2821,6 +2821,20 @@ body:not(.dark) .auth-input:-webkit-autofill:focus {
 .dark .auth-input:-webkit-autofill:focus {
   border: 1px solid rgba(34, 197, 94, 0.75) !important;
 }
+
+/* Prevent automatic zoom on focus in iOS safari/chrome on all inputs, selects, and textareas */
+@media screen and (max-width: 768px) {
+  input, 
+  select, 
+  textarea, 
+  .auth-input, 
+  input.auth-input, 
+  input[type="email"].auth-input, 
+  input[type="password"].auth-input {
+    font-size: 16px !important;
+  }
+}
+
 
 
 
