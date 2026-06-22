@@ -761,41 +761,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Theme Selection */}
-          <div>
-            <div className="t-xs t-bold t-muted" style={{ marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Moon size={14} style={{ color: 'var(--accent)' }} /> {t('display_mode')}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-              {[
-                { id: 'light', label: t('light'), icon: <Sun size={14} /> },
-                { id: 'dark', label: t('dark'), icon: <Moon size={14} /> },
-                { id: 'auto', label: t('system'), icon: <Monitor size={14} /> }
-              ].map(mode => (
-                <button
-                  key={mode.id}
-                  onClick={() => setThemeMode(mode.id as any)}
-                  className="t-sm t-semibold"
-                  style={{ 
-                    padding: '10px 8px', borderRadius: '10px', border: '1px solid',
-                    cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-                    background: themeMode === mode.id ? 'var(--accent)' : 'var(--glass-strong)',
-                    color: themeMode === mode.id ? 'white' : 'inherit',
-                    borderColor: themeMode === mode.id ? 'var(--accent)' : 'var(--glass-border)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {mode.icon}
-                  {mode.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
-          <div className="t-xs t-muted" style={{ marginTop: '8px', padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', textAlign: 'center' }}>
-            {t('pref_footer')}
-          </div>
         </div>
       </GenericModal>
     </motion.div>

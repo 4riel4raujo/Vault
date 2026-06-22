@@ -77,9 +77,11 @@ export default function Investments({ db, onEdit, onDelete }: Props) {
                       position: window.innerWidth < 768 ? 'bottom' : 'right',
                       labels: {
                         boxWidth: 8,
-                        usePointStyle: true,
-                        font: { size: 10 },
-                        color: isDark ? 'rgba(235,235,245,0.7)' : '#48484a'
+                        boxHeight: 8,
+                        usePointStyle: false,
+                        font: { size: 8.5 },
+                        color: isDark ? 'rgba(235,235,245,0.7)' : '#48484a',
+                        padding: 6
                       }
                     }
                   }

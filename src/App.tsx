@@ -129,32 +129,22 @@ function AppContent() {
     });
     const unsubInv = dbService.subscribeInvestimentos(user.uid, activeCarteiraId, (data) => {
       setDb(prev => ({ ...prev, investimentos: data }));
-      
-      // Auto-sync: ensure all investments have a corresponding transaction
-      // This handles investments created before the sync logic was added
-      data.forEach(inv => {
-        const lancId = 'l_inv_' + inv.id;
-        const exists = db.lancamentos.some(l => l.id === lancId);
-        if (!exists) {
-          const custoAporte = inv.qtd * inv.preco;
-          dbService.saveLancamento({
-            id: lancId,
-            tipo: OperationType.INVESTIMENTO,
-            data: inv.data || dbService.getToday(),
-            valor: custoAporte,
-            desc: `Investimento: ${inv.ativo}`,
-            cat: inv.tipo,
-            obs: 'Lançamento automático via carteira de ativos (Sincronização)',
-            carteiraId: activeCarteiraId
-          } as Lancamento, user.uid);
-        }
-      });
+    });
+
+    const unsubFixed = dbService.subscribeGastosFixos(user.uid, (data) => {
+      setDb(prev => ({ ...prev, gastosFixos: data }));
+    });
+
+    const unsubShopping = dbService.subscribeShoppingItems(user.uid, (data) => {
+      setDb(prev => ({ ...prev, shoppingItems: data }));
     });
 
     return () => {
       unsubLanc();
       unsubMetas();
       unsubInv();
+      unsubFixed();
+      unsubShopping();
     };
   }, [user, activeCarteiraId]);
 
@@ -165,6 +155,38 @@ function AppContent() {
       setCurrentPage('dashboard');
     }
   }, [db.carteiras, activeCarteiraId, currentPage]);
+
+  // Auto-sync: keep investment transactions in sync with investments
+  useEffect(() => {
+    if (!user || !activeCarteiraId || db.investimentos.length === 0) return;
+
+    db.investimentos.forEach(inv => {
+      const lancId = 'l_inv_' + inv.id;
+      const custoAporte = (inv.qtd && inv.preco) ? (inv.qtd * inv.preco) : inv.valor;
+      const existingLanc = db.lancamentos.find(l => l.id === lancId);
+
+      if (!existingLanc) {
+        dbService.saveLancamento({
+          id: lancId,
+          tipo: OperationType.INVESTIMENTO,
+          data: inv.data || dbService.getToday(),
+          valor: custoAporte,
+          desc: `Investimento: ${inv.ativo}`,
+          cat: inv.tipo,
+          obs: 'Lançamento automático via carteira de ativos (Sincronização)',
+          carteiraId: activeCarteiraId
+        } as Lancamento, user.uid);
+      } else if (existingLanc.valor !== custoAporte || existingLanc.desc !== `Investimento: ${inv.ativo}` || existingLanc.cat !== inv.tipo) {
+        // Correct the transaction details if mismatch (including old 0.00 balances or description/category changes)
+        dbService.saveLancamento({
+          ...existingLanc,
+          valor: custoAporte,
+          desc: `Investimento: ${inv.ativo}`,
+          cat: inv.tipo
+        }, user.uid);
+      }
+    });
+  }, [user, activeCarteiraId, db.investimentos, db.lancamentos]);
 
   const [lastSignIn, setLastSignIn] = useState<string>('');
 
@@ -281,7 +303,7 @@ function AppContent() {
       await dbService.saveInvestimento(fullInv, user.uid);
       
       // Criar/atualizar lançamento vinculado para histórico
-      const custoAporte = fullInv.qtd * fullInv.preco;
+      const custoAporte = (fullInv.qtd && fullInv.preco) ? (fullInv.qtd * fullInv.preco) : fullInv.valor;
       const lancId = 'l_inv_' + id;
       
       await dbService.saveLancamento({

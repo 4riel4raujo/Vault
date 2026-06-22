@@ -163,17 +163,59 @@ export default function Login() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
+        backgroundColor: isDark ? '#04120C' : '#f0f6f3'
       }}
     >
-      {/* Background ultra-soft subtle forest mist overlay */}
-      <div className={`absolute inset-0 pointer-events-none transition-colors duration-500 ${isDark ? 'bg-black/35' : 'bg-[#0c1f13]/5'}`} />
+      {/* Background premium forest overlay, balanced transparency to keep image beautifully visible */}
+      <div 
+        className="fixed inset-0 pointer-events-none transition-opacity duration-700"
+        style={{
+          background: isDark 
+            ? 'linear-gradient(to bottom, rgba(4, 18, 12, 0.55), rgba(7, 26, 18, 0.70))' 
+            : 'linear-gradient(to bottom, rgba(240, 246, 243, 0.05), rgba(220, 235, 226, 0.15))',
+          mixBlendMode: isDark ? 'multiply' : 'normal',
+          zIndex: 1
+        }}
+      />
+      
+      {/* Neblina verde escura (emerald mist / indirect lighting shadows) */}
+      <div 
+        className="fixed inset-0 pointer-events-none overflow-hidden"
+        style={{ zIndex: 2 }}
+      >
+        {/* Glow left center */}
+        <div 
+          className="absolute -left-1/4 top-1/4 w-[60%] h-[60%] rounded-full blur-[160px] transition-all duration-700" 
+          style={{
+            background: isDark ? '#0C6B37' : '#34D399',
+            opacity: isDark ? 0.12 : 0.06
+          }}
+        />
+        {/* Glow right bottom */}
+        <div 
+          className="absolute -right-1/4 -bottom-1/4 w-[70%] h-[70%] rounded-full blur-[200px] transition-all duration-700" 
+          style={{
+            background: isDark ? '#22C55E' : '#15803D',
+            opacity: isDark ? 0.14 : 0.08
+          }}
+        />
+        {/* Neblina overlay */}
+        <div 
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{
+            background: isDark 
+              ? 'radial-gradient(circle at 50% 50%, rgba(4, 18, 12, 0) 45%, rgba(4, 18, 12, 0.65) 100%)' 
+              : 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 60%, rgba(240, 246, 243, 0.05) 100%)',
+          }}
+        />
+      </div>
 
       {/* Center wrapper to perfectly align everything between the top of the page and the footer line */}
-      <div className="flex-1 flex items-center justify-center w-full z-10 px-7 sm:px-10 py-8 lg:px-12 pt-6 lg:pt-10 pb-8 lg:pb-[200px]">
+      <div className="flex-1 flex items-center justify-center w-full z-10 px-7 sm:px-10 py-8 lg:px-12 pt-6 lg:pt-10 pb-8 lg:pb-12">
         {/* Main Container - Holds Left Branding Column & Right Glass Login Card */}
         <div 
           className="relative w-full max-w-[1380px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16 lg:px-4"
-          style={{ width: isMobile ? '100%' : '1384px', maxWidth: '100%' }}
+          style={{ width: isMobile ? '100%' : '1384px', maxWidth: '100%', zIndex: 10 }}
         >
         
         {/* Left Column: Branding and Features List */}
@@ -192,12 +234,17 @@ export default function Login() {
             height: isMobile ? 'auto' : '550px'
           }}
         >
-          {/* Soft, light mist gradient overlay matching background landscape tones to guarantee text legibility */}
-          <div className={`absolute -inset-x-6 sm:-inset-x-10 -inset-y-6 lg:-inset-x-14 lg:-inset-y-10 bg-gradient-to-br to-transparent rounded-[48px] blur-3xl -z-10 pointer-events-none transition-all duration-500 ${
-            isDark ? 'from-[#052414]/85 via-[#09351e]/50' : 'from-[#f3faf6]/70 via-[#e4f2ea]/45'
-          }`} />
+          {/* Soft ambient mist overlay behind branding to ensure readability without any hard borders or shapes */}
+          <div 
+            className="absolute -inset-x-24 -inset-y-24 blur-[80px] -z-10 pointer-events-none transition-all duration-500"
+            style={{
+              background: isDark 
+                ? 'radial-gradient(circle at center, rgba(4, 18, 12, 0.85) 0%, rgba(4, 18, 12, 0) 80%)' 
+                : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0) 80%)',
+            }}
+          />
           
-          {/* Logo brand row matching screenshot exactly */}
+          {/* Logo brand row */}
           <div 
             className="flex items-center justify-center lg:justify-start gap-3.5 w-full"
             style={isMobile ? {
@@ -210,17 +257,17 @@ export default function Login() {
             <Logo size={48} />
             <div className="text-left font-sans">
               <h1 
-                className={`font-extrabold tracking-tight font-sans antialiased leading-none transition-colors duration-200 ${isDark ? 'text-white' : 'text-[#0c2f1d]'}`}
+                className={`font-semibold tracking-tight font-sans antialiased leading-none transition-colors duration-200 ${isDark ? 'text-[#F8FAFC]' : 'text-[#04120C]'}`}
                 style={{ fontSize: '30px' }}
               >
                 Vault
               </h1>
               <p 
-                className={`text-xs tracking-[0.25em] font-black uppercase leading-none mt-1 transition-colors duration-200 ${isDark ? 'text-green-400' : 'text-[#15803d]'}`}
+                className={`text-[9px] tracking-[0.3em] font-black uppercase leading-none mt-1 transition-colors duration-200 ${isDark ? 'text-[#22C55E]' : 'text-[#0C6B37]'}`}
                 style={isMobile ? {
                   paddingRight: '0px',
                   marginBottom: '0px',
-                  marginTop: '0px'
+                  marginTop: '1px'
                 } : undefined}
               >
                 Smart Finance
@@ -228,142 +275,169 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Slogan & Subtitle */}
-          <div className="hidden lg:flex py-1 lg:py-2 flex-col items-center lg:items-start w-full">
+          {/* Slogan & Subtitle with Pure White and Institutional Green Highlight */}
+          <div 
+            className="hidden lg:flex py-1 lg:py-2 flex-col items-center lg:items-start w-full"
+            style={{ marginTop: '10px' }}
+          >
             <h2 
-              className={`font-extrabold tracking-tight leading-[1.25] lg:leading-[1.28] max-w-xl mb-3 lg:mb-5 antialiased transition-colors duration-200 ${isDark ? 'text-white' : 'text-[#0c2f1d]'}`}
+              className={`font-extrabold tracking-tight leading-[1.25] lg:leading-[1.28] max-w-xl mb-3 lg:mb-5 antialiased transition-colors duration-200 ${isDark ? 'text-[#F8FAFC]' : 'text-[#04120C]'}`}
               style={{
-                fontSize: isMobile ? '24px' : '32px',
-                textAlign: isMobile ? 'center' : 'left',
-                ...(isMobile ? {
-                  paddingTop: '12px',
-                  paddingLeft: '0px'
-                } : {})
+                fontSize: '34px',
+                textAlign: 'left'
               }}
             >
-              Gestão financeira com mais controle, <span className={`font-extrabold block sm:inline transition-colors duration-200 ${isDark ? 'text-green-400' : 'text-[#12a14b]'}`}>clareza e segurança</span>
+              Gestão financeira com mais controle, <span className="font-extrabold block sm:inline transition-colors duration-200" style={{ color: isDark ? '#22C55E' : '#0C6B37' }}>clareza e segurança</span>
             </h2>
             <p 
-              className={`text-sm sm:text-base font-semibold leading-relaxed max-w-xl antialiased transition-colors duration-200 text-center lg:text-left ${isDark ? 'text-green-200/80' : 'text-[#2d4d3a]/85'}`}
-              style={isMobile ? {
-                paddingTop: '0px',
-                paddingLeft: '0px'
-              } : undefined}
+              className={`text-sm sm:text-base font-medium leading-relaxed max-w-xl antialiased transition-colors duration-200 text-center lg:text-left ${isDark ? 'text-[#94A3B8]' : 'text-[#0f172a]'}`}
             >
               Tecnologia inteligente para controlar receitas, despesas, planejar investimentos e acompanhar sua evolução patrimonial em tempo real.
             </p>
           </div>
 
-          {/* Feature Lists matching screenshot closely */}
+          {/* Feature Lists matching Dashboard standard card layout perfectly */}
           <div 
-            className="hidden lg:flex flex-col gap-y-5 lg:gap-y-9 max-w-xl w-full"
+            className="hidden lg:flex flex-col gap-y-4 lg:gap-y-6 max-w-xl w-full"
             style={{
               lineHeight: '24px',
-              height: isMobile ? 'auto' : '240px',
-              marginTop: '20px',
-              ...(isMobile ? {
-                paddingTop: '15px',
-                paddingLeft: '0px'
-              } : {})
+              width: isMobile ? '100%' : '576px',
+              height: isMobile ? 'auto' : '200px',
+              paddingLeft: '0px',
+              paddingTop: '0px',
+              fontSize: '16px',
+              marginTop: '30px'
             }}
           >
             {/* Feature 1 */}
-            <div className="flex items-start gap-5 max-w-md mx-auto lg:mx-0 w-full text-left">
-              <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-all duration-200 ${
-                isDark 
-                  ? 'bg-green-950/40 border border-green-800/40 text-green-400' 
-                  : 'bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 text-[#1c5f32]'
-              }`}>
-                <TrendingUp size={22} />
+            <div className="flex items-start gap-4 max-w-md mx-auto lg:mx-0 w-full text-left">
+              <div 
+                className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
+                style={{
+                  background: isDark ? 'rgba(34, 197, 94, 0.08)' : 'rgba(12, 107, 55, 0.15)',
+                  border: isDark ? '1px solid rgba(34, 197, 94, 0.12)' : '1px solid rgba(12, 107, 55, 0.22)',
+                  color: isDark ? '#22C55E' : '#042f1a'
+                }}
+              >
+                <TrendingUp size={20} className="stroke-[2.5]" />
               </div>
               <div className="flex-1">
-                <h3 className={`font-extrabold text-base leading-snug transition-colors duration-200 ${isDark ? 'text-white' : 'text-[#0c2f1d]'}`}>Fluxo de Caixa Inteligente</h3>
+                <h3 
+                  className={`font-bold text-sm leading-snug transition-colors duration-200 ${isDark ? 'text-[#F8FAFC]' : 'text-[#04120C]'}`}
+                  style={{ fontSize: '14px' }}
+                >
+                  Fluxo de Caixa Inteligente
+                </h3>
                 <p 
-                  className={`text-sm leading-relaxed transition-colors duration-200 ${isDark ? 'text-green-200/70' : 'text-[#3d5c4b]/95'}`}
+                  className={`text-xs leading-relaxed transition-colors duration-200 ${isDark ? 'text-[#94A3B8]' : 'text-[#0f172a]'}`}
                   style={{
-                    width: isMobile ? '100%' : '460px',
-                    height: isMobile ? 'auto' : '30px',
-                    marginTop: '5px'
+                    width: '460px',
+                    marginTop: '3px',
+                    paddingTop: '0px',
+                    marginBottom: '15px'
                   }}
                 >
-                  Acompanhe entradas, saídas e saldo em tempo real com clareza.
+                  Acompanhe entradas, saídas e saldo em tempo real com clareza absoluta.
                 </p>
               </div>
             </div>
-
+ 
             {/* Feature 2 */}
-            <div className="flex items-start gap-5 max-w-md mx-auto lg:mx-0 w-full text-left">
-              <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-all duration-200 ${
-                isDark 
-                  ? 'bg-green-950/40 border border-green-800/40 text-green-400' 
-                  : 'bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 text-[#1c5f32]'
-              }`}>
-                <Target size={22} />
+            <div className="flex items-start gap-4 max-w-md mx-auto lg:mx-0 w-full text-left">
+              <div 
+                className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
+                style={{
+                  background: isDark ? 'rgba(34, 197, 94, 0.08)' : 'rgba(12, 107, 55, 0.15)',
+                  border: isDark ? '1px solid rgba(34, 197, 94, 0.12)' : '1px solid rgba(12, 107, 55, 0.22)',
+                  color: isDark ? '#22C55E' : '#042f1a'
+                }}
+              >
+                <Target size={20} className="stroke-[2.5]" />
               </div>
               <div className="flex-1">
-                <h3 className={`font-extrabold text-base leading-snug transition-colors duration-200 ${isDark ? 'text-white' : 'text-[#0c2f1d]'}`}>Planejamento de Investimentos</h3>
+                <h3 className={`font-bold text-sm leading-snug transition-colors duration-200 ${isDark ? 'text-[#F8FAFC]' : 'text-[#04120C]'}`}>Planejamento de Investimentos</h3>
                 <p 
-                  className={`text-sm leading-relaxed transition-colors duration-200 ${isDark ? 'text-green-200/70' : 'text-[#3d5c4b]/95'}`}
+                  className={`text-xs leading-relaxed transition-colors duration-200 ${isDark ? 'text-[#94A3B8]' : 'text-[#0f172a]'}`}
                   style={{
-                    width: isMobile ? '100%' : '460px',
-                    height: isMobile ? 'auto' : '30px',
-                    marginTop: '5px'
+                    width: '460px',
+                    marginTop: '3px',
+                    marginBottom: '15px'
                   }}
                 >
-                  Organize seus objetivos e invista com estratégia e segurança.
+                  Organize seus objetivos e invista com estratégia bem delineada e segurança.
                 </p>
               </div>
             </div>
-
+ 
             {/* Feature 3 */}
-            <div className="flex items-start gap-5 max-w-md mx-auto lg:mx-0 w-full text-left">
-              <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm transition-all duration-200 ${
-                isDark 
-                  ? 'bg-green-950/40 border border-green-800/40 text-green-400' 
-                  : 'bg-[#0c2f1d]/5 border border-[#0c2f1d]/12 text-[#1c5f32]'
-              }`}>
-                <ShieldCheck size={22} />
+            <div className="flex items-start gap-4 max-w-md mx-auto lg:mx-0 w-full text-left">
+              <div 
+                className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
+                style={{
+                  background: isDark ? 'rgba(34, 197, 94, 0.08)' : 'rgba(12, 107, 55, 0.15)',
+                  border: isDark ? '1px solid rgba(34, 197, 94, 0.12)' : '1px solid rgba(12, 107, 55, 0.22)',
+                  color: isDark ? '#22C55E' : '#042f1a'
+                }}
+              >
+                <ShieldCheck size={20} className="stroke-[2.5]" />
               </div>
               <div className="flex-1">
-                <h3 className={`font-extrabold text-base leading-snug transition-colors duration-200 ${isDark ? 'text-white' : 'text-[#0c2f1d]'}`}>Segurança de Alto Nível</h3>
+                <h3 className={`font-bold text-sm leading-snug transition-colors duration-200 ${isDark ? 'text-[#F8FAFC]' : 'text-[#04120C]'}`}>Segurança de Alto Nível</h3>
                 <p 
-                  className={`text-sm leading-relaxed transition-colors duration-200 ${isDark ? 'text-green-200/70' : 'text-[#3d5c4b]/95'}`}
+                  className={`text-xs leading-relaxed transition-colors duration-200 ${isDark ? 'text-[#94A3B8]' : 'text-[#0f172a]'}`}
                   style={{
-                    width: isMobile ? '100%' : '460px',
-                    height: isMobile ? 'auto' : '30px',
-                    marginTop: '5px'
+                    width: '460px',
+                    marginTop: '3px'
                   }}
                 >
-                  Seus dados protegidos com criptografia de nível bancário.
+                  Seus dados protegidos de ponta a ponta com criptografia de padrão bancário.
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Right Column: Frosted Glassmorphism Login Card Form */}
+        {/* Right Column: Liquid Glass Premium Login Card */}
         <div className="w-full lg:w-[42%] flex flex-col items-center lg:items-end justify-center px-0 lg:px-0">
           <motion.div 
-            className={`relative w-full backdrop-blur-[40px] rounded-[36px] flex flex-col justify-center overflow-hidden z-10 transition-all duration-500 ${
-              isDark 
-                ? 'bg-black/20 border border-white/[0.12] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.65)] hover:bg-black/25' 
-                : 'bg-white/[0.08] border border-white/45 shadow-[0_32px_64px_-16px_rgba(8,30,16,0.14)] hover:bg-white/[0.12]'
-            }`}
+            className="relative w-full rounded-[30px] flex flex-col justify-center overflow-hidden z-10 transition-all duration-500"
             style={{
               paddingLeft: isMobile ? '24px' : '38px',
               paddingRight: isMobile ? '24px' : '38px',
-              paddingTop: '18px',
-              paddingBottom: '18px',
+              paddingTop: '28px',
+              paddingBottom: '28px',
               marginBottom: '0px',
               marginRight: '0px',
-              width: isMobile ? '90%' : '460px',
-              maxWidth: isMobile ? '400px' : '460px',
-              height: isMobile ? 'auto' : '470px'
+              width: isMobile ? '92%' : '440px',
+              maxWidth: isMobile ? '400px' : '440px',
+              height: isMobile ? 'auto' : '500px',
+              background: isDark 
+                ? 'linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(6, 22, 15, 0.82) 40%, rgba(12, 107, 55, 0.18) 100%)' 
+                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 246, 243, 0.72) 45%, rgba(12, 107, 55, 0.09) 100%)',
+              backdropFilter: 'blur(35px) saturate(120%)',
+              WebkitBackdropFilter: 'blur(35px) saturate(120%)',
+              border: isDark 
+                ? '1px solid rgba(255, 255, 255, 0.14)' 
+                : '1px solid rgba(255, 255, 255, 0.65)',
+              boxShadow: isDark 
+                ? 'inset 0 1.5px 2px rgba(255,255,255,0.18), inset 0 -1px 2px rgba(0,0,0,0.4), 0 25px 50px -12px rgba(0, 0, 0, 0.75)' 
+                : 'inset 0 1.5px 3px rgba(255,255,255,0.9), inset 0 -1px 1.5px rgba(12, 107, 55, 0.05), 0 25px 50px -12px rgba(12, 47, 29, 0.12)'
             }}
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
           >
+            {/* Liquid glass specular and refraction simulation */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: isDark 
+                  ? 'linear-gradient(125deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 35%, rgba(34,197,94,0.06) 65%, rgba(255,255,255,0.02) 100%)'
+                  : 'linear-gradient(125deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 30%, rgba(12,107,55,0.04) 60%, rgba(255,255,255,0.15) 100%)',
+                zIndex: -1
+              }}
+            />
+            
             <AnimatePresence mode="wait" initial={false}>
               {isForgotPassword ? (
                 <motion.div
@@ -381,7 +455,7 @@ export default function Login() {
                     </h3>
                     <p 
                       className={`text-xs mt-1.5 antialiased font-semibold tracking-normal transition-colors duration-200 ${isDark ? 'text-green-200/80' : 'text-[#2d4d3a]'}`}
-                      style={{ marginBottom: '8px', paddingBottom: '26px' }}
+                      style={{ marginBottom: '8px', paddingBottom: '26px', color: '#779d8a' }}
                     >
                       Digite seu e-mail para continuar no Vault
                     </p>
@@ -423,24 +497,34 @@ export default function Login() {
                     {/* Email field */}
                     <div>
                       <label className={`block text-[10px] font-extrabold tracking-[0.16em] mb-1.5 uppercase select-none text-left transition-colors duration-200 ${
-                        isDark ? 'text-green-300' : 'text-[#0c2d1c]'
+                        isDark ? 'text-green-400' : 'text-[#0c2d1c]'
                       }`}>
                         E-mail
                       </label>
                       <div className="relative flex items-center">
                         <Mail size={15} className={`absolute left-[15px] pointer-events-none z-10 transition-colors duration-200 ${
-                          isDark ? 'text-green-300/80' : 'text-[#0c2d1c]/80'
+                          isDark ? 'text-green-400/80' : 'text-[#0C6B37]/80'
                         }`} />
                         <input
                           type="email"
                           placeholder="Seu email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className={`auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md ${
-                            isDark 
-                              ? 'bg-white/[0.03] hover:bg-white/[0.07] focus:bg-white/[0.11] border border-white/10 hover:border-white/15 focus:border-[#22c55e]/60 text-white placeholder-white/30' 
-                              : 'bg-[#f0f6f3]/35 hover:bg-[#f0f6f3]/50 focus:bg-[#f0f6f3]/65 border border-[#0c2d1c]/12 hover:border-[#0c2d1c]/22 focus:border-[#22c55e] text-[#0c2d1c] placeholder-[#2d4d3a]/55'
-                          }`}
+                          className="auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md"
+                          style={{
+                            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(12, 107, 55, 0.05)',
+                            border: '1px solid rgba(34, 197, 94, 0.15)',
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
+                            color: isDark ? '#F8FAFC' : '#04120C',
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.40)';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.15)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+                            e.target.style.boxShadow = 'none';
+                          }}
                           autoComplete="email"
                           required
                         />
@@ -460,19 +544,21 @@ export default function Login() {
                           setSuccess(null);
                         }}
                         className={`text-xs font-bold tracking-tight hover:underline transition duration-150 ${
-                          isDark ? 'text-green-400 hover:text-green-400/80' : 'text-[#0e4224] hover:text-[#1c5f2b]'
+                          isDark ? 'text-green-400 hover:text-green-300' : 'text-[#0C6B37] hover:text-[#1c5f2b]'
                         }`}
                       >
                         Voltar para o login
                       </button>
                     </div>
 
-                    {/* Submit Button */}
+                    {/* Submit Button with dashboard premium gradient and hover */}
                     <motion.button
                       type="submit"
-                      className={`w-full h-[44px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg hover:shadow-[#12552b]/30 rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-200 mt-2 uppercase text-center ${
-                        isDark ? 'shadow-[#000000]/30' : 'shadow-[#12552b]/20'
-                      }`}
+                      className="w-full h-[44px] text-white hover:brightness-110 active:scale-[0.98] rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-300 mt-2 uppercase text-center cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(135deg, #15803D, #22C55E)',
+                        boxShadow: '0 4px 14px rgba(34, 197, 94, 0.25)',
+                      }}
                       disabled={loading}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -502,7 +588,7 @@ export default function Login() {
                     </h3>
                     <p 
                       className={`text-xs mt-1.5 antialiased font-semibold tracking-normal transition-colors duration-200 ${isDark ? 'text-green-200/80' : 'text-[#2d4d3a]'}`}
-                      style={{ marginBottom: '8px', paddingBottom: '26px' }}
+                      style={{ marginBottom: '8px', paddingBottom: '26px', color: '#779d8a' }}
                     >
                       Entre com seus dados para se cadastrar
                     </p>
@@ -544,24 +630,34 @@ export default function Login() {
                     {/* Email field */}
                     <div>
                       <label className={`block text-[10px] font-extrabold tracking-[0.16em] mb-1.5 uppercase select-none text-left transition-colors duration-200 ${
-                        isDark ? 'text-green-300' : 'text-[#0c2d1c]'
+                        isDark ? 'text-green-400' : 'text-[#0c2d1c]'
                       }`}>
                         E-mail
                       </label>
                       <div className="relative flex items-center">
                         <Mail size={15} className={`absolute left-[15px] pointer-events-none z-10 transition-colors duration-200 ${
-                          isDark ? 'text-green-300/80' : 'text-[#0c2d1c]/80'
+                          isDark ? 'text-green-400/80' : 'text-[#0C6B37]/80'
                         }`} />
                         <input
                           type="email"
                           placeholder="Seu melhor email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className={`auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md ${
-                            isDark 
-                              ? 'bg-white/[0.03] hover:bg-white/[0.07] focus:bg-white/[0.11] border border-white/10 hover:border-white/15 focus:border-[#22c55e]/60 text-white placeholder-white/30' 
-                              : 'bg-[#f0f6f3]/35 hover:bg-[#f0f6f3]/50 focus:bg-[#f0f6f3]/65 border border-[#0c2d1c]/12 hover:border-[#0c2d1c]/22 focus:border-[#22c55e] text-[#0c2d1c] placeholder-[#2d4d3a]/55'
-                          }`}
+                          className="auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md"
+                          style={{
+                            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(12, 107, 55, 0.05)',
+                            border: '1px solid rgba(34, 197, 94, 0.15)',
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
+                            color: isDark ? '#F8FAFC' : '#04120C',
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.40)';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.15)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+                            e.target.style.boxShadow = 'none';
+                          }}
                           autoComplete="email"
                           required
                         />
@@ -571,24 +667,34 @@ export default function Login() {
                     {/* Password field */}
                     <div>
                       <label className={`block text-[10px] font-extrabold tracking-[0.16em] mb-1.5 uppercase select-none text-left transition-colors duration-200 ${
-                        isDark ? 'text-green-300' : 'text-[#0c2d1c]'
+                        isDark ? 'text-green-400' : 'text-[#0c2d1c]'
                       }`}>
                         Senha
                       </label>
                       <div className="relative flex items-center">
                         <Lock size={15} className={`absolute left-[15px] pointer-events-none z-10 transition-colors duration-200 ${
-                          isDark ? 'text-green-300/80' : 'text-[#0c2d1c]/80'
+                          isDark ? 'text-green-400/80' : 'text-[#0C6B37]/80'
                         }`} />
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder="Crie uma senha forte"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className={`auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-[44px] font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md ${
-                            isDark 
-                              ? 'bg-white/[0.03] hover:bg-white/[0.07] focus:bg-white/[0.11] border border-white/10 hover:border-white/15 focus:border-[#22c55e]/60 text-white placeholder-white/30' 
-                              : 'bg-[#f0f6f3]/35 hover:bg-[#f0f6f3]/50 focus:bg-[#f0f6f3]/65 border border-[#0c2d1c]/12 hover:border-[#0c2d1c]/22 focus:border-[#22c55e] text-[#0c2d1c] placeholder-[#2d4d3a]/55'
-                          }`}
+                          className="auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-[44px] font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md"
+                          style={{
+                            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(12, 107, 55, 0.05)',
+                            border: '1px solid rgba(34, 197, 94, 0.15)',
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
+                            color: isDark ? '#F8FAFC' : '#04120C',
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.40)';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.15)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+                            e.target.style.boxShadow = 'none';
+                          }}
                           autoComplete="new-password"
                           required
                         />
@@ -596,7 +702,7 @@ export default function Login() {
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className={`absolute right-4 transition duration-150 z-10 ${
-                            isDark ? 'text-green-300/70 hover:text-green-200' : 'text-[#0c2d1c]/70 hover:text-[#0c2d1c]'
+                            isDark ? 'text-green-400/70 hover:text-green-300' : 'text-[#0C6B37]/70 hover:text-[#0C6B37]'
                           }`}
                         >
                           {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -610,9 +716,11 @@ export default function Login() {
                     {/* Submit Button */}
                     <motion.button
                       type="submit"
-                      className={`w-full h-[44px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg hover:shadow-[#12552b]/30 rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-200 mt-2 uppercase text-center ${
-                        isDark ? 'shadow-[#000000]/30' : 'shadow-[#12552b]/20'
-                      }`}
+                      className="w-full h-[44px] text-white hover:brightness-110 active:scale-[0.98] rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-300 mt-2 uppercase text-center cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(135deg, #15803D, #22C55E)',
+                        boxShadow: '0 4px 14px rgba(34, 197, 94, 0.25)',
+                      }}
                       disabled={loading}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -731,7 +839,7 @@ export default function Login() {
                     </h3>
                     <p 
                       className={`text-xs mt-1.5 antialiased font-semibold tracking-normal transition-colors duration-200 ${isDark ? 'text-green-200/80' : 'text-[#2d4d3a]'}`}
-                      style={{ marginBottom: '8px', paddingBottom: '26px' }}
+                      style={{ marginBottom: '8px', paddingBottom: '26px', color: '#779d8a' }}
                     >
                       Entre com seus dados para continuar no Vault
                     </p>
@@ -773,24 +881,34 @@ export default function Login() {
                     {/* Email field */}
                     <div>
                       <label className={`block text-[10px] font-extrabold tracking-[0.16em] mb-1.5 uppercase select-none text-left transition-colors duration-200 ${
-                        isDark ? 'text-green-300' : 'text-[#0c2d1c]'
+                        isDark ? 'text-green-400' : 'text-[#0c2d1c]'
                       }`}>
                         E-mail
                       </label>
                       <div className="relative flex items-center">
                         <Mail size={15} className={`absolute left-[15px] pointer-events-none z-10 transition-colors duration-200 ${
-                          isDark ? 'text-green-300/80' : 'text-[#0c2d1c]/80'
+                          isDark ? 'text-green-400/80' : 'text-[#0C6B37]/80'
                         }`} />
                         <input
                           type="email"
                           placeholder="Seu email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className={`auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md ${
-                            isDark 
-                              ? 'bg-white/[0.03] hover:bg-white/[0.07] focus:bg-white/[0.11] border border-white/10 hover:border-white/15 focus:border-[#22c55e]/60 text-white placeholder-white/30' 
-                              : 'bg-[#f0f6f3]/35 hover:bg-[#f0f6f3]/50 focus:bg-[#f0f6f3]/65 border border-[#0c2d1c]/12 hover:border-[#0c2d1c]/22 focus:border-[#22c55e] text-[#0c2d1c] placeholder-[#2d4d3a]/55'
-                          }`}
+                          className="auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-4 font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md"
+                          style={{
+                            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(12, 107, 55, 0.05)',
+                            border: '1px solid rgba(34, 197, 94, 0.15)',
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
+                            color: isDark ? '#F8FAFC' : '#04120C',
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.40)';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.15)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+                            e.target.style.boxShadow = 'none';
+                          }}
                           autoComplete="email"
                           required
                         />
@@ -800,24 +918,34 @@ export default function Login() {
                     {/* Password field */}
                     <div>
                       <label className={`block text-[10px] font-extrabold tracking-[0.16em] mb-1.5 uppercase select-none text-left transition-colors duration-200 ${
-                        isDark ? 'text-green-300' : 'text-[#0c2d1c]'
+                        isDark ? 'text-green-400' : 'text-[#0c2d1c]'
                       }`}>
                         Senha
                       </label>
                       <div className="relative flex items-center">
                         <Lock size={15} className={`absolute left-[15px] pointer-events-none z-10 transition-colors duration-200 ${
-                          isDark ? 'text-green-300/80' : 'text-[#0c2d1c]/80'
+                          isDark ? 'text-green-400/80' : 'text-[#0C6B37]/80'
                         }`} />
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder="Digite sua senha"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className={`auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-[44px] font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md ${
-                            isDark 
-                              ? 'bg-white/[0.03] hover:bg-white/[0.07] focus:bg-white/[0.11] border border-white/10 hover:border-white/15 focus:border-[#22c55e]/60 text-white placeholder-white/30' 
-                              : 'bg-[#f0f6f3]/35 hover:bg-[#f0f6f3]/50 focus:bg-[#f0f6f3]/65 border border-[#0c2d1c]/12 hover:border-[#0c2d1c]/22 focus:border-[#22c55e] text-[#0c2d1c] placeholder-[#2d4d3a]/55'
-                          }`}
+                          className="auth-input w-full h-[44px] rounded-[12px] !pl-[44px] !pr-[44px] font-semibold outline-none transition duration-200 text-sm shadow-sm backdrop-blur-md"
+                          style={{
+                            background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(12, 107, 55, 0.05)',
+                            border: '1px solid rgba(34, 197, 94, 0.15)',
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
+                            color: isDark ? '#F8FAFC' : '#04120C',
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.40)';
+                            e.target.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.15)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+                            e.target.style.boxShadow = 'none';
+                          }}
                           autoComplete="current-password"
                           required
                         />
@@ -825,7 +953,7 @@ export default function Login() {
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className={`absolute right-4 transition duration-150 z-10 ${
-                            isDark ? 'text-green-300/70 hover:text-green-200' : 'text-[#0c2d1c]/70 hover:text-[#0c2d1c]'
+                            isDark ? 'text-green-300/70 hover:text-green-350' : 'text-[#0C6B37]/70 hover:text-[#0C6B37]'
                           }`}
                         >
                           {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -843,7 +971,7 @@ export default function Login() {
                           setSuccess(null);
                         }}
                         className={`text-xs font-bold tracking-tight hover:underline transition duration-150 ${
-                          isDark ? 'text-green-400 hover:text-green-300' : 'text-[#0e4224] hover:text-[#1c5f2b]'
+                          isDark ? 'text-green-400 hover:text-green-350' : 'text-[#0C6B37] hover:text-[#1c5f2b]'
                         }`}
                       >
                         Esqueceu a senha?
@@ -853,9 +981,11 @@ export default function Login() {
                     {/* Submit Button */}
                     <motion.button
                       type="submit"
-                      className={`w-full h-[44px] bg-gradient-to-b from-[#2d874c] to-[#12552b] text-white hover:brightness-[1.04] active:brightness-[0.96] shadow-lg hover:shadow-[#12552b]/30 rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-200 mt-2 uppercase text-center ${
-                        isDark ? 'shadow-[#000000]/30' : 'shadow-[#12552b]/20'
-                      }`}
+                      className="w-full h-[44px] text-white hover:brightness-110 active:scale-[0.98] rounded-[12px] font-extrabold tracking-[0.12em] text-xs flex items-center justify-center gap-2 transition-all duration-300 mt-2 uppercase text-center cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(135deg, #15803D, #22C55E)',
+                        boxShadow: '0 4px 14px rgba(34, 197, 94, 0.25)',
+                      }}
                       disabled={loading}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -871,18 +1001,26 @@ export default function Login() {
 
                   {/* Separador e Social Providers */}
                   <div className="w-full">
-                    <div 
+                     <div 
                       className="flex items-center my-6 select-none"
                       style={{
                         marginRight: '0px',
                         marginBottom: '5px',
-                        marginTop: '5px'
+                        marginTop: '5px',
+                        height: '15px',
+                        width: isMobile ? '100%' : '362.4px'
                       }}
                     >
                       <div className={`flex-grow border-t transition-colors duration-200 ${isDark ? 'border-white/10' : 'border-[#0c2f1d]/15'}`}></div>
-                      <span className={`mx-4 text-[10px] font-extrabold uppercase tracking-[0.2em] transition-colors duration-200 ${
-                        isDark ? 'text-emerald-300/60' : 'text-[#2d4d3a]/80'
-                      }`}>ou</span>
+                      <span 
+                        className={`mx-4 font-extrabold uppercase tracking-[0.2em] transition-colors duration-200 ${
+                          isDark ? 'text-emerald-300/60' : 'text-[#2d4d3a]/80'
+                        }`}
+                        style={{
+                          fontSize: '10px',
+                          color: '#779d8a'
+                        }}
+                      >ou</span>
                       <div className={`flex-grow border-t transition-colors duration-200 ${isDark ? 'border-white/10' : 'border-[#0c2f1d]/15'}`}></div>
                     </div>
  
@@ -963,69 +1101,6 @@ export default function Login() {
           </motion.div>
         </div>
       </div>
-      </div>
-
-      {/* Elegant modern bottom footer */}
-      <div 
-        className="relative md:absolute bottom-0 md:bottom-5 left-0 right-0 z-10 flex flex-col gap-2.5 select-none w-[90%] max-w-[400px] md:max-w-none md:w-auto md:left-12 md:right-12 pb-6 md:pb-0 mt-auto md:mt-0 animate-fade-in mx-auto"
-        style={{
-          width: isMobile ? '90%' : 'auto',
-          maxWidth: isMobile ? '400px' : '100%'
-        }}
-      >
-        {/* Subtle horizontal line divider */}
-        <div className="w-full border-t border-white/20 transition-colors duration-500" />
-        
-        {/* Row with all contents aligned on the exact same line */}
-        <div className="flex flex-row items-center justify-between gap-2.5 w-full">
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            <ShieldCheck size={13} className="text-white/70 stroke-[1.8] transition-colors duration-500 shrink-0" />
-            
-            {/* Vertical line separator */}
-            <div className="h-3 border-l border-white/20 transition-colors duration-500 shrink-0" />
-
-            {/* Copyright content - compact and scaled down to prevent wrapping on small phone screens */}
-            <div className="text-[8px] min-[370px]:text-[9px] sm:text-[10px] tracking-[0.06em] sm:tracking-[0.14em] font-extrabold uppercase flex items-center gap-1 sm:gap-2 transition-colors duration-500 text-white/70 whitespace-nowrap select-none">
-              <span>© 2026 Vault Inc.</span>
-              <span className="inline-block w-1 h-1 rounded-full bg-current opacity-60" />
-              <span>
-                Todos os direitos reservados
-              </span>
-            </div>
-          </div>
-
-          {/* iOS/macOS style Toggle on the same right line */}
-          <div 
-            onClick={() => setThemeMode(isDark ? 'light' : 'dark')}
-            className={`w-[44px] sm:w-[48px] h-[24px] sm:h-[26px] rounded-full p-[2px] cursor-pointer relative transition-all duration-300 flex items-center border select-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.12)] shrink-0 ${
-              isDark 
-                ? 'bg-[#22c55e] border-[#22c55e]/30 justify-end' 
-                : 'bg-white/15 border-white/25 hover:bg-white/25 justify-start'
-            }`}
-            title={isDark ? "Mudar para Modo Dia" : "Mudar para Modo Noite"}
-          >
-            {/* Inner icons to match iOS layout details */}
-            <div className="absolute left-[5px] text-white/30 pointer-events-none flex items-center justify-center">
-              <Sun size={8} className="stroke-[2.5]" />
-            </div>
-            <div className="absolute right-[5px] text-white/30 pointer-events-none flex items-center justify-center">
-              <Moon size={8} className="stroke-[2.5]" />
-            </div>
-
-            {/* Sliding Knob with layout transition */}
-            <motion.div 
-              layout
-              transition={{ type: "spring", stiffness: 450, damping: 28 }}
-              className="w-[18px] sm:w-[20px] h-[18px] sm:h-[20px] rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.22)] flex items-center justify-center bg-white z-10"
-            >
-              {isDark ? (
-                <Moon size={8} className="text-green-700 stroke-[2.5] fill-green-500/10" />
-              ) : (
-                <Sun size={8} className="text-amber-500 stroke-[2.5] fill-amber-500/10" />
-              )}
-            </motion.div>
-          </div>
-        </div>
       </div>
     </div>
   );

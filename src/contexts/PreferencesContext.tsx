@@ -29,6 +29,9 @@ const translations: Record<Language, Record<string, string>> = {
     'settings': 'Configurações',
     'patrimony': 'Patrimônio total',
     'revenue_month': 'Receitas (mês)',
+    'savings_rate': 'Taxa de Poupança',
+    'fixed_commitments': 'Custos Fixos',
+    'goals_progress': 'Progresso de Metas',
     'expenses_month': 'Despesas (mês)',
     'balance_month': 'Saldo do mês',
     'recent_transactions': 'Últimas transações',
@@ -142,7 +145,6 @@ const translations: Record<Language, Record<string, string>> = {
     'units': 'un.',
     'total_income': 'Total Receitas',
     'total_expense': 'Total Despesas',
-    'savings_rate': 'Taxa de Poupança',
     'net_worth': 'Patrimônio Líquido',
     'equity_evolution': 'Evolução Patrimonial',
     'expense_ranking': 'Ranking de Despesas',
@@ -341,6 +343,9 @@ const translations: Record<Language, Record<string, string>> = {
     'settings': 'Settings',
     'patrimony': 'Total Net Worth',
     'revenue_month': 'Revenue (month)',
+    'savings_rate': 'Savings Rate',
+    'fixed_commitments': 'Fixed Overhead',
+    'goals_progress': 'Goals Progress',
     'expenses_month': 'Expenses (month)',
     'balance_month': 'Month Balance',
     'recent_transactions': 'Recent Transactions',
@@ -454,7 +459,6 @@ const translations: Record<Language, Record<string, string>> = {
     'units': 'units',
     'total_income': 'Total Income',
     'total_expense': 'Total Expense',
-    'savings_rate': 'Savings Rate',
     'net_worth': 'Net Worth',
     'equity_evolution': 'Equity Evolution',
     'expense_ranking': 'Expense Ranking',
@@ -653,6 +657,9 @@ const translations: Record<Language, Record<string, string>> = {
     'settings': 'Ajustes',
     'patrimony': 'Patrimonio total',
     'revenue_month': 'Ingresos (mes)',
+    'savings_rate': 'Tasa de Ahorro',
+    'fixed_commitments': 'Gastos Fijos',
+    'goals_progress': 'Progreso de Metas',
     'expenses_month': 'Gastos (mes)',
     'balance_month': 'Saldo del mes',
     'recent_transactions': 'Últimas transacciones',
@@ -766,7 +773,6 @@ const translations: Record<Language, Record<string, string>> = {
     'units': 'un.',
     'total_income': 'Total de Ingresos',
     'total_expense': 'Total de Gastos',
-    'savings_rate': 'Tasa de Ahorro',
     'net_worth': 'Patrimonio Neto',
     'equity_evolution': 'Evolución Patrimonial',
     'expense_ranking': 'Ranking de Gastos',
@@ -962,7 +968,7 @@ const PreferencesContext = createContext<PreferencesContextType | undefined>(und
 export function PreferencesProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>((localStorage.getItem('app-language') as Language) || 'pt-BR');
   const [currency, setCurrencyState] = useState<Currency>((localStorage.getItem('app-currency') as Currency) || 'BRL');
-  const [themeMode, setThemeModeState] = useState<ThemeMode>((localStorage.getItem('app-theme-mode') as ThemeMode) || 'auto');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('auto');
   const [isDark, setIsDark] = useState(false);
   const [showBalances, setShowBalancesState] = useState<boolean>(() => {
     const val = localStorage.getItem('app-show-balances');
@@ -971,14 +977,7 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const applyTheme = () => {
-      let dark = false;
-      if (themeMode === 'dark') {
-        dark = true;
-      } else if (themeMode === 'light') {
-        dark = false;
-      } else {
-        dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      }
+      let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       
       setIsDark(dark);
       if (dark) {
@@ -994,14 +993,12 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
-      if (themeMode === 'auto') {
-        applyTheme();
-      }
+      applyTheme();
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [themeMode]);
+  }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -1014,8 +1011,8 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   };
 
   const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
-    localStorage.setItem('app-theme-mode', mode);
+    setThemeModeState('auto');
+    localStorage.setItem('app-theme-mode', 'auto');
   };
 
   const setShowBalances = (show: boolean) => {

@@ -14,7 +14,7 @@ import {
   Filler
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
-import { Calendar, TrendingUp, TrendingDown, PieChart, Activity, DollarSign, ArrowUp, ArrowDown, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, PieChart, Activity, DollarSign, ArrowUpRight, ArrowDownRight, ArrowRight, Eye, EyeOff, Percent, CalendarCheck, Target, PiggyBank } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { DBState, COLORS, Carteira, CAT_MAP } from '../types';
 
@@ -124,6 +124,42 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
 
   const invPct = getPercentageDiff(totalInvCurrent, totalInvPrev);
 
+  // 1. Savings Rate / Taxa de Poupança
+  const savingsRate = tm.rec > 0 ? ((tm.rec - tm.desp) / tm.rec) * 100 : 0;
+  const pmSavingsRate = pm.rec > 0 ? ((pm.rec - pm.desp) / pm.rec) * 100 : 0;
+  const savingsRateDiff = savingsRate - pmSavingsRate;
+
+  // 2. Custos Fixos / Fixed Commitments (for active wallet)
+  const activeGastosFixos = activeWall 
+    ? db.gastosFixos.filter(gf => gf.carteiraId === activeWall.id)
+    : db.gastosFixos;
+  const totalFixedExpenses = activeGastosFixos.reduce((s, gf) => s + gf.valor, 0);
+  const fixedCount = activeGastosFixos.length;
+
+  const salarySum = db.lancamentos
+    .filter(l => l.data.startsWith(currentMonthKey) && (l.cat === 'Salário' || l.cat === 'salary'))
+    .reduce((sum, l) => sum + l.valor, 0);
+  const baseIncome = salarySum > 0 ? salarySum : tm.rec;
+  const commitmentRatio = baseIncome > 0 ? (totalFixedExpenses / baseIncome) * 100 : 0;
+
+  const commitmentRatioText = commitmentRatio > 0 
+    ? ` (${commitmentRatio.toFixed(0)}% ${language === 'en-US' ? 'of income' : language === 'es-ES' ? 'de los ingresos' : 'da renda'})`
+    : '';
+
+  const fixedSubtext = language === 'en-US' 
+    ? `${fixedCount} active ${fixedCount === 1 ? 'commitment' : 'commitments'}${commitmentRatioText}`
+    : language === 'es-ES'
+      ? `${fixedCount} ${fixedCount === 1 ? 'compromiso activo' : 'compromisos activos'}${commitmentRatioText}`
+      : `${fixedCount} ${fixedCount === 1 ? 'compromisso ativo' : 'compromissos ativos'}${commitmentRatioText}`;
+
+  // 3. Metas Progress / Progresso de Metas (for active wallet)
+  const activeMetas = activeWall 
+    ? db.metas.filter(m => m.carteiraId === activeWall.id)
+    : db.metas;
+  const totalGoalTarget = activeMetas.reduce((s, m) => s + m.valor, 0);
+  const totalGoalCurrent = activeMetas.reduce((s, m) => s + m.atual, 0);
+  const overallGoalProgress = totalGoalTarget > 0 ? (totalGoalCurrent / totalGoalTarget) * 100 : 0;
+
   const vsText = language === 'en-US' ? 'vs previous month' : language === 'es-ES' ? 'vs mes anterior' : 'vs mês anterior';
 
   const formatPercent = (val: number) => {
@@ -231,13 +267,13 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
       initial="hidden"
       animate="show"
     >
-      <motion.div className="saldo-box" variants={itemVar}>
+      <motion.div className="saldo-box" variants={itemVar} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
         <div className="saldo-col">
           <div className="saldo-label">
             {t('patrimony')}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div className="saldo-main">
+            <div className="saldo-main text-2xl sm:text-3xl lg:text-[38px]" style={{ fontWeight: '800', letterSpacing: '-0.025em', lineHeight: '1.1' }}>
               {showBalances ? formatCurrency(tudo.saldo - tudo.inv + totalInv) : '••••'}
             </div>
             <button
@@ -255,98 +291,75 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
               }}
               title={showBalances ? 'Esconder saldos' : 'Mostrar saldos'}
             >
-              {showBalances ? <Eye size={18} strokeWidth={2.5} /> : <EyeOff size={18} strokeWidth={2.5} />}
+              {showBalances ? <Eye size={20} strokeWidth={2.5} /> : <EyeOff size={20} strokeWidth={2.5} />}
             </button>
           </div>
           <div style={{ fontSize: '11px', opacity: 0.75, marginTop: '5px', fontWeight: '500' }}>
             {language === 'en-US' ? 'Updated today at' : language === 'es-ES' ? 'Actualizado hoy, a las' : 'Atualizado hoje, às'} {updateTime}
           </div>
         </div>
-
-        <div className="saldo-divider" />
-
-        <div className="saldo-col">
-          <div className="saldo-chip-lbl" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" /> {t('revenue_month')}
-          </div>
-          <div className="saldo-chip-val" style={{ fontSize: '20px', fontWeight: '700' }}>
-            {showBalances ? formatCurrency(tm.rec) : '••••'}
-          </div>
-          <div className="saldo-compare" style={{ fontSize: '11px', color: recPct >= 0 ? '#6ee7b7' : '#fca5a5', fontWeight: '600', marginTop: '4px' }}>
-            {formatPercent(recPct)} {vsText}
-          </div>
-        </div>
-
-        <div className="saldo-divider" />
-
-        <div className="saldo-col">
-          <div className="saldo-chip-lbl" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <ArrowDown size={11} strokeWidth={3} className="text-rose-300" /> {t('expenses_month')}
-          </div>
-          <div className="saldo-chip-val" style={{ fontSize: '20px', fontWeight: '700' }}>
-            {showBalances ? formatCurrency(tm.desp) : '••••'}
-          </div>
-          <div className="saldo-compare" style={{ fontSize: '11px', color: despPct <= 0 ? '#6ee7b7' : '#fca5a5', fontWeight: '600', marginTop: '4px' }}>
-            {formatPercent(despPct)} {vsText}
-          </div>
-        </div>
-
-        <div className="saldo-divider" />
-
-        <div className="saldo-col">
-          <div className="saldo-chip-lbl" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <DollarSign size={11} strokeWidth={3} style={{ color: 'rgba(255,255,255,0.8)' }} /> {t('balance_month')}
-          </div>
-          <div className="saldo-chip-val" style={{ fontSize: '20px', fontWeight: '700' }}>
-            {showBalances ? formatCurrency(tm.saldo) : '••••'}
-          </div>
-          <div className="saldo-compare" style={{ fontSize: '11px', color: tm.saldo >= 0 ? '#6ee7b7' : '#fca5a5', fontWeight: '600', marginTop: '4px' }}>
-            {formatPercent(saldoPct)} {vsText}
-          </div>
-        </div>
       </motion.div>
-      <div className="cards-row" style={activeWall?.tipo === 'Empresarial' ? { gridTemplateColumns: 'repeat(3, 1fr)' } : {}}>        <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
-          <div className="metric-icon" style={{ background: 'var(--green-g)' }}>
-             <TrendingUp size={16} strokeWidth={2.5} color="var(--green)" />
+      <div className="cards-row" style={activeWall?.tipo === 'Empresarial' ? { gridTemplateColumns: 'repeat(3, 1fr)' } : {}}>
+        {/* Card 1: Receitas (Mês) */}
+        <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
+          <div className="metric-icon" style={{ background: 'rgba(34, 197, 94, 0.12)' }}>
+             <ArrowUpRight size={18} strokeWidth={2.5} color="#22c55e" />
           </div>
           <div className="metric-label">{t('revenue_month')}</div>
-          <div className="metric-val pos">{showBalances ? formatCurrency(tm.rec) : '••••'}</div>
+          <div className="metric-val pos text-[18px] sm:text-[21px] lg:text-[24px]" style={{ color: '#22c55e' }}>
+            {showBalances ? formatCurrency(tm.rec) : '••••'}
+          </div>
           <div className="metric-compare" style={{ marginTop: '5px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3.5px', fontWeight: '500' }}>
-            <span style={{ color: recPct >= 0 ? '#05df72' : 'var(--red)', fontWeight: '700' }}>{formatPercent(recPct)}</span>
+            <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93', fontWeight: '700' }}>
+              {formatPercent(recPct)}
+            </span>
             <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93' }}>{vsText}</span>
           </div>
         </motion.div>
+
+        {/* Card 2: Despesas (Mês) */}
         <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
-          <div className="metric-icon" style={{ background: 'var(--red-g)' }}>
-             <TrendingDown size={16} strokeWidth={2.5} color="var(--red)" />
+          <div className="metric-icon" style={{ background: 'rgba(255, 69, 58, 0.12)' }}>
+             <ArrowDownRight size={18} strokeWidth={2.5} color="var(--red)" />
           </div>
           <div className="metric-label">{t('expenses_month')}</div>
-          <div className="metric-val neg">{showBalances ? formatCurrency(tm.desp) : '••••'}</div>
+          <div className="metric-val neg text-[18px] sm:text-[21px] lg:text-[24px]" style={{ color: 'var(--red)' }}>
+            {showBalances ? formatCurrency(tm.desp) : '••••'}
+          </div>
           <div className="metric-compare" style={{ marginTop: '5px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3.5px', fontWeight: '500' }}>
-            <span style={{ color: despPct <= 0 ? '#05df72' : 'var(--red)', fontWeight: '700' }}>{formatPercent(despPct)}</span>
+            <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93', fontWeight: '700' }}>
+              {formatPercent(despPct)}
+            </span>
             <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93' }}>{vsText}</span>
           </div>
         </motion.div>
+
+        {/* Card 3: Saldo do Mês */}
         <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
-          <div className="metric-icon" style={{ background: tm.saldo >= 0 ? 'var(--green-g)' : 'var(--red-g)' }}>
-               <DollarSign size={16} strokeWidth={2.5} color={tm.saldo >= 0 ? 'var(--green)' : 'var(--red)'} />
+          <div className="metric-icon" style={{ background: 'rgba(14, 165, 233, 0.12)' }}>
+             <DollarSign size={16} strokeWidth={2.5} color="#0ea5e9" />
           </div>
           <div className="metric-label">{t('balance_month')}</div>
-          <div className={`metric-val ${tm.saldo >= 0 ? 'pos' : 'neg'}`}>{showBalances ? formatCurrency(tm.saldo) : '••••'}</div>
+          <div className={`metric-val ${tm.saldo >= 0 ? 'pos' : 'neg'} text-[18px] sm:text-[21px] lg:text-[24px]`} style={{ color: '#0ea5e9' }}>
+            {showBalances ? formatCurrency(tm.saldo) : '••••'}
+          </div>
           <div className="metric-compare" style={{ marginTop: '5px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3.5px', fontWeight: '500' }}>
-            <span style={{ color: saldoPct >= 0 ? '#05df72' : 'var(--red)', fontWeight: '700' }}>{formatPercent(saldoPct)}</span>
+            <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93', fontWeight: '700' }}>
+              {formatPercent(saldoPct)}
+            </span>
             <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93' }}>{vsText}</span>
           </div>
         </motion.div>
+
         {activeWall?.tipo !== 'Empresarial' && (
           <motion.div className="metric" variants={itemVar} whileHover={{ y: -4 }}>
             <div className="metric-icon" style={{ background: 'rgba(175,82,222,0.13)' }}>
               <TrendingUp size={16} strokeWidth={2.5} color="#af52de" />
             </div>
             <div className="metric-label">{t('investments')}</div>
-            <div className="metric-val" style={{ color: 'var(--purple)' }}>{showBalances ? formatCurrency(totalInv) : '••••'}</div>
+            <div className="metric-val text-[18px] sm:text-[21px] lg:text-[24px]" style={{ color: '#af52de' }}>{showBalances ? formatCurrency(totalInv) : '••••'}</div>
             <div className="metric-compare" style={{ marginTop: '5px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '3.5px', fontWeight: '500' }}>
-              <span style={{ color: invPct >= 0 ? '#af52de' : 'var(--red)', fontWeight: '700' }}>{formatPercent(invPct)}</span>
+              <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93', fontWeight: '700' }}>{formatPercent(invPct)}</span>
               <span style={{ color: isDark ? 'rgba(235,235,245,0.45)' : '#8e8e93' }}>{vsText}</span>
             </div>
           </motion.div>
@@ -461,7 +474,14 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
                   plugins: {
                     legend: { 
                       position: window.innerWidth < 768 ? 'bottom' as const : 'right' as const,
-                      labels: { boxWidth: 10, usePointStyle: true, font: { size: 10 }, color: chartColors.legendColor }
+                      labels: { 
+                        boxWidth: 8, 
+                        boxHeight: 8, 
+                        usePointStyle: false, 
+                        font: { size: 8.5 }, 
+                        color: chartColors.legendColor,
+                        padding: 6
+                      }
                     },
                     tooltip: {
                       callbacks: {
