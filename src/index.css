@@ -2540,6 +2540,11 @@ option {
   color: #fff !important;
 }
 
+.light .custom-dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: var(--text) !important;
+}
+
 .custom-dropdown-item.active {
   background: var(--accent) !important;
   color: #fff !important;

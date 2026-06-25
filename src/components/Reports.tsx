@@ -29,7 +29,7 @@ export default function Reports({ db, onExportCSV }: Props) {
   const tudo = dbService.getTotais(db.lancamentos);
   const totalValue = db.investimentos.reduce((s, i) => s + i.valor, 0);
   const taxaPoupanca = tudo.rec > 0 ? ((tudo.rec - tudo.desp) / tudo.rec * 100).toFixed(1) : '0.0';
-  const totPatrimonio = tudo.saldo - tudo.inv + totalValue;
+  const totPatrimonio = tudo.saldo + totalValue;
 
   const metrics = [
     { label: t('total_income'), val: formatCurrency(tudo.rec), cls: 'pos' },

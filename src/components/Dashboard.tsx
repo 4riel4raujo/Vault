@@ -274,7 +274,7 @@ export default function Dashboard({ db, activeWall, onViewMore }: Props) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="saldo-main text-2xl sm:text-3xl lg:text-[38px]" style={{ fontWeight: '800', letterSpacing: '-0.025em', lineHeight: '1.1' }}>
-              {showBalances ? formatCurrency(tudo.saldo - tudo.inv + totalInv) : '••••'}
+              {showBalances ? formatCurrency(tudo.saldo + totalInv) : '••••'}
             </div>
             <button
               onClick={() => setShowBalances(!showBalances)}

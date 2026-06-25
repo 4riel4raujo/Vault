@@ -138,16 +138,40 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
               { id: 'receita', label: t('incomes') || 'Receitas', icon: ArrowUpCircle },
               { id: 'despesa', label: t('expenses') || 'Despesas', icon: ArrowDownCircle },
               { id: 'investimento', label: t('investments') || 'Investimentos', icon: TrendingUp }
-            ].map(tItem => (
-              <div 
-                key={tItem.id}
-                className={`chip ${tipoFiltro === tItem.id ? 'active' : ''} chip-${tItem.id}`}
-                onClick={() => { setTipoFiltro(tItem.id); setSelectedIds([]); }}
-              >
-                <tItem.icon size={14} />
-                <span>{tItem.label}</span>
-              </div>
-            ))}
+            ].map(tItem => {
+              const isActive = tipoFiltro === tItem.id;
+              return (
+                <div 
+                  key={tItem.id}
+                  className={`chip ${isActive ? 'active' : ''} chip-${tItem.id} relative overflow-hidden`}
+                  onClick={() => { setTipoFiltro(tItem.id); setSelectedIds([]); }}
+                  style={{
+                    ...(isActive ? { 
+                      background: 'transparent', 
+                      borderColor: 'transparent',
+                      transition: 'none' 
+                    } : {})
+                  }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-chip-bg"
+                      className="absolute inset-0"
+                      style={{
+                        background: tItem.id === 'todos' ? 'var(--text)' :
+                                    tItem.id === 'receita' ? 'var(--green)' :
+                                    tItem.id === 'despesa' ? 'var(--red)' : '#8a3ffc',
+                        borderRadius: 'inherit',
+                        zIndex: 0,
+                      }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <tItem.icon size={14} className="relative z-10" />
+                  <span className="relative z-10">{tItem.label}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -226,7 +250,7 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
               <th style={{ width: '80px' }}></th>
             </tr>
           </thead>
-          <motion.tbody variants={container} initial="hidden" animate="show">
+          <motion.tbody key={tipoFiltro} variants={container} initial="hidden" animate="show">
             {filtered.map(l => (
               <motion.tr 
                 key={l.id} 
@@ -266,7 +290,7 @@ export default function Transactions({ db, onEdit, onDelete, onBulkDelete, onBul
         </table>
 
         <div className="mobile-only-list">
-          <motion.div variants={container} initial="hidden" animate="show" className="mobile-list-container">
+          <motion.div key={tipoFiltro} variants={container} initial="hidden" animate="show" className="mobile-list-container">
             {filtered.map(l => (
               <motion.div 
                 key={l.id} 

@@ -60,10 +60,30 @@ export default function Login() {
         await loginWithEmail(email, password);
       }
     } catch (err: any) {
-      console.error('Auth Error:', err);
-      const errorCode = err.code || '';
-      const errorMsg = err.message || '';
+      const errorCode = err?.code || '';
+      const errorMsg = err?.message || '';
       const errorStrLower = (errorCode + ' ' + errorMsg).toLowerCase();
+      
+      const isExpectedUserError = [
+        'auth/user-not-found',
+        'auth/wrong-password',
+        'auth/invalid-credential',
+        'auth/invalid-login-credentials',
+        'auth/invalid-email',
+        'auth/weak-password',
+        'auth/email-already-in-use',
+        'auth/too-many-requests'
+      ].includes(errorCode) || 
+      errorStrLower.includes('invalid-credential') || 
+      errorStrLower.includes('wrong-password') || 
+      errorStrLower.includes('credentials') || 
+      errorStrLower.includes('user-not-found');
+
+      if (isExpectedUserError) {
+        console.warn('Auth validation warning (user inputted invalid credentials):', err);
+      } else {
+        console.error('Auth Error:', err);
+      }
       
       if (errorCode === 'auth/user-not-found' || 
           errorCode === 'auth/wrong-password' || 
@@ -157,22 +177,15 @@ export default function Login() {
 
   return (
     <div 
-      className="fixed inset-0 w-full h-full transition-colors duration-500 overflow-hidden"
+      className="absolute inset-0 min-h-screen w-full flex flex-col transition-colors duration-500 overflow-y-auto overflow-x-hidden"
       style={{
+        backgroundImage: isDark ? `url('/login_background_dark.png')` : `url('/login_background.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
         backgroundColor: isDark ? '#04120C' : '#f0f6f3'
       }}
     >
-      {/* Background stabilized forest image */}
-      <div 
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{
-          backgroundImage: isDark ? `url('/login_background_dark.png')` : `url('/login_background.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          zIndex: 0
-        }}
-      />
       {/* Background premium forest overlay, balanced transparency to keep image beautifully visible */}
       <div 
         className="fixed inset-0 pointer-events-none transition-opacity duration-700"
